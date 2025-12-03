@@ -35,12 +35,19 @@ export default function PaymentPage() {
     }
   }, [router])
 
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      minimumFractionDigits: 0,
-    }).format(price)
+  const formatPrice = (price: number) =>
+    new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(price)
+
+  // --- Envío dinámico ---
+  const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
+  const totalWithShipping = totalPrice + shippingCost
+  const formatShipping = shippingCost === 0 ? "Gratis" : formatPrice(shippingCost)
+
+  let shippingMessage = ""
+  if (totalPrice < 50000) {
+    shippingMessage = `¡Estás cerca! Solo ${formatPrice(50000 - totalPrice)} más y tu pedido tendrá envío por solo 5.000 COP.`
+  } else if (totalPrice < 100000) {
+    shippingMessage = `¡Casi llegas! Agrega ${formatPrice(100000 - totalPrice)} más para disfrutar de envío gratis en tu pedido.`
   }
 
   const handlePayment = async () => {
@@ -48,14 +55,11 @@ export default function PaymentPage() {
 
     setIsProcessing(true)
 
-    // Simular proceso de pago real
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
-    // Generar número de pedido único
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
 
     try {
-      // Guardar en MongoDB
       const response = await fetch("/api/orders", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -63,7 +67,7 @@ export default function PaymentPage() {
           orderNumber,
           cliente: checkoutData,
           productos: items,
-          total: totalPrice,
+          total: totalWithShipping,
           estado: "Pendiente",
           metodoPago: paymentMethods.find((m) => m.id === selectedMethod)?.name || "",
           createdAt: new Date(),
@@ -78,11 +82,8 @@ export default function PaymentPage() {
         return
       }
 
-      // Limpiar local y carrito
       clearCart()
       localStorage.removeItem("antojitosquin-checkout")
-
-      // Guardar número de pedido para mostrar en la confirmación
       localStorage.setItem("antojitosquin-last-order", orderNumber)
 
       router.push("/confirmation")
@@ -166,9 +167,15 @@ export default function PaymentPage() {
 
           <hr className="border-border my-4" />
 
-          <div className="flex justify-between font-bold text-lg text-foreground">
+          <div className="flex justify-between text-muted-foreground mb-1">
+            <span>Envío</span>
+            <span className="text-accent font-medium">{formatShipping}</span>
+          </div>
+          {shippingMessage && <p className="text-sm font-semibold mt-1 text-green-600">{shippingMessage}</p>}
+
+          <div className="flex justify-between font-bold text-lg text-foreground mt-3">
             <span>Total a pagar</span>
-            <span className="text-primary">{formatPrice(totalPrice)}</span>
+            <span className="text-primary">{formatPrice(totalWithShipping)}</span>
           </div>
         </div>
 

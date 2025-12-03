@@ -18,6 +18,21 @@ export default function CartPage() {
     }).format(price)
   }
 
+  // Lógica de envío según valor del carrito
+  const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
+  const formatShipping = shippingCost === 0 ? "Gratis" : formatPrice(shippingCost)
+  const totalWithShipping = totalPrice + shippingCost
+
+  // Mensaje dinámico de incentivo más motivador
+  let shippingMessage = ""
+  if (totalPrice < 50000) {
+    const diff = 50000 - totalPrice
+    shippingMessage = `¡Estás cerca! Solo ${formatPrice(diff)} más y tu pedido tendrá envío por solo 5.000 COP.`
+  } else if (totalPrice < 100000) {
+    const diff = 100000 - totalPrice
+    shippingMessage = `¡Casi llegas! Agrega ${formatPrice(diff)} más para disfrutar de envío gratis en tu pedido.`
+  }
+
   return (
     <div className="min-h-screen bg-background">
       <StoreHeader />
@@ -125,14 +140,23 @@ export default function CartPage() {
                     <span>Subtotal ({totalItems} productos)</span>
                     <span>{formatPrice(totalPrice)}</span>
                   </div>
-                  <div className="flex justify-between text-muted-foreground">
-                    <span>Envío</span>
-                    <span className="text-accent font-medium">Gratis</span>
+
+                  <div className="flex flex-col">
+                    <div className="flex justify-between text-muted-foreground">
+                      <span>Envío</span>
+                      <span className="text-accent font-medium">{formatShipping}</span>
+                    </div>
+                    {shippingMessage && (
+                      <p className="text-sm font-semibold mt-1 text-green-600">
+                        {shippingMessage}
+                      </p>
+                    )}
                   </div>
+
                   <hr className="border-border" />
                   <div className="flex justify-between text-lg font-bold text-foreground">
                     <span>Total</span>
-                    <span className="text-primary">{formatPrice(totalPrice)}</span>
+                    <span className="text-primary">{formatPrice(totalWithShipping)}</span>
                   </div>
                 </div>
 

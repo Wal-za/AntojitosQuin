@@ -81,7 +81,8 @@ export function StoreHeader() {
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
               <Store className="w-5 h-5 text-primary-foreground" />
             </div>
-            <div className="hidden sm:flex flex-col">
+            {/* Nombre solo desktop */}
+            <div className="hidden md:flex flex-col">
               <span className="font-bold text-xl text-foreground leading-tight">AntojitosQuin</span>
               <span className="text-[10px] text-muted-foreground -mt-0.5">Tu tienda virtual</span>
             </div>
@@ -98,7 +99,10 @@ export function StoreHeader() {
             >
               <span className="font-medium text-sm text-foreground">{selectedCategoryName}</span>
               <ChevronDown
-                className={cn("w-4 h-4 text-muted-foreground transition-transform", categoryOpen && "rotate-180")}
+                className={cn(
+                  "w-4 h-4 text-muted-foreground transition-transform",
+                  categoryOpen && "rotate-180"
+                )}
               />
             </button>
 
@@ -120,7 +124,7 @@ export function StoreHeader() {
             )}
           </div>
 
-          {/* Search Bar - Desktop */}
+          {/* Desktop Search Bar */}
           <form onSubmit={handleSearch} className="hidden md:flex flex-1 max-w-lg">
             <div className="relative w-full">
               <input
@@ -140,6 +144,21 @@ export function StoreHeader() {
             </div>
           </form>
 
+          {/* Mobile Search Bar */}
+          <form
+            onSubmit={handleSearch}
+            className="flex md:hidden flex-1 relative"
+          >
+            <input
+              type="text"
+              placeholder="Buscar..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full px-4 py-2.5 pl-10 pr-4 rounded-full border border-border bg-background focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all text-sm"
+            />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          </form>
+
           {/* Cart & Mobile Menu */}
           <div className="flex items-center gap-2">
             <Link
@@ -150,7 +169,7 @@ export function StoreHeader() {
               )}
             >
               <ShoppingCart className="w-5 h-5 text-primary" />
-              <span className="hidden sm:block text-sm font-medium text-primary">Carrito</span>
+              <span className="text-sm font-medium text-primary hidden sm:block">Carrito</span>
               {totalItems > 0 && (
                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-primary text-primary-foreground text-xs font-bold rounded-full flex items-center justify-center">
                   {totalItems}

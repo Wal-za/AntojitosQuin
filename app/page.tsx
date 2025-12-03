@@ -12,22 +12,31 @@ import { SearchX, Loader2 } from "lucide-react"
 
 export default function HomePage() {
   const { products, searchProducts, getProductsByCategory, loading, error } = useProducts()
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const searchParams = useSearchParams()
   const searchQuery = searchParams.get("search")
   const categoryParam = searchParams.get("category")
 
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [filteredProducts, setFilteredProducts] = useState(products)
 
   // --- PAGINACIÓN ---
   const [currentPage, setCurrentPage] = useState(1)
   const productsPerPage = 20
 
-  const indexOfLastProduct = currentPage * productsPerPage
-  const indexOfFirstProduct = indexOfLastProduct - productsPerPage
-  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
-  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+  // --- Productos destacados ---
+  const newProducts = products.filter((p) => p.etiqueta?.includes("nuevo11"))
+  const popularProducts = products.filter((p) => p.etiqueta?.includes("popular11"))
 
+  // --- Sincronización URL -> selectedCategory ---
+  useEffect(() => {
+    if (categoryParam) {
+      setSelectedCategory(decodeURIComponent(categoryParam))
+    } else {
+      setSelectedCategory(null)
+    }
+  }, [categoryParam])
+
+  // --- Filtrado de productos ---
   useEffect(() => {
     setCurrentPage(1) // Reinicia la página al cambiar búsqueda o categoría
 
@@ -40,6 +49,23 @@ export default function HomePage() {
       setFilteredProducts(products)
     }
   }, [searchQuery, selectedCategory, products, searchProducts, getProductsByCategory])
+
+  const indexOfLastProduct = currentPage * productsPerPage
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1)
+  }
+  const handleNextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1)
+  }
+
+  function capitalizeFirstLetter(str: string | null) {
+    if (!str) return ""
+    return str.charAt(0).toUpperCase() + str.slice(1)
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -55,6 +81,29 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Productos Destacados */}
+      {newProducts.length > 0 && (
+        <section className="py-6 px-4 max-w-7xl mx-auto">
+          <h2 className="text-xl font-bold text-foreground mb-4">¡Nuevos Productos!</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {newProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+
+      {popularProducts.length > 0 && (
+        <section className="py-6 px-4 max-w-7xl mx-auto">
+          <h2 className="text-xl font-bold text-foreground mb-4">Populares</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+            {popularProducts.map((product) => (
+              <ProductCard key={product.id} product={product} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Search Results Info */}
       {searchQuery && (
         <div className="px-4 py-2 max-w-7xl mx-auto">
@@ -65,15 +114,15 @@ export default function HomePage() {
         </div>
       )}
 
-      {/* Offers Section - Only show on home without search */}
+      {/* Offers Section */}
       {!searchQuery && !selectedCategory && !categoryParam && !loading && <OffersSection />}
 
-      {/* Products Grid */}
+      {/* Productos principales */}
       <section className="py-8 px-4 flex-1">
         <div className="max-w-7xl mx-auto">
           {!searchQuery && (
             <h2 className="text-2xl font-bold text-foreground mb-6">
-              {categoryParam || selectedCategory || "Todos los Productos"}
+              {capitalizeFirstLetter(categoryParam) || capitalizeFirstLetter(selectedCategory) || "Todos los Productos"}
             </h2>
           )}
 
@@ -100,18 +149,32 @@ export default function HomePage() {
 
               {/* --- PAGINACIÓN --- */}
               {totalPages > 1 && (
-                <div className="flex justify-center mt-6 space-x-2">
-                  {Array.from({ length: totalPages }, (_, i) => (
-                    <button
-                      key={i}
-                      onClick={() => setCurrentPage(i + 1)}
-                      className={`px-3 py-1 rounded ${
-                        currentPage === i + 1 ? "bg-primary text-white" : "bg-gray-200"
-                      }`}
-                    >
-                      {i + 1}
-                    </button>
-                  ))}
+                <div className="flex justify-center items-center mt-6 gap-4">
+                  <button
+                    onClick={handlePrevPage}
+                    disabled={currentPage === 1}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full shadow transition-colors
+        ${currentPage === 1
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-800 hover:bg-primary hover:text-white'}`}
+                  >
+                    &#8592;
+                  </button>
+
+                  <span className="w-10 h-10 flex items-center justify-center rounded-full bg-primary text-white font-bold shadow">
+                    {currentPage}
+                  </span>
+
+                  <button
+                    onClick={handleNextPage}
+                    disabled={currentPage === totalPages}
+                    className={`w-10 h-10 flex items-center justify-center rounded-full shadow transition-colors
+        ${currentPage === totalPages
+                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        : 'bg-white text-gray-800 hover:bg-primary hover:text-white'}`}
+                  >
+                    &#8594;
+                  </button>
                 </div>
               )}
             </>
@@ -126,7 +189,6 @@ export default function HomePage() {
       </section>
 
       <ScrollToTop />
-
       <StoreFooter />
     </div>
   )

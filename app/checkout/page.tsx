@@ -92,6 +92,14 @@ export default function CheckoutPage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
+
+    // Marcar todos los campos como touched para mostrar errores
+    const allTouched: Record<string, boolean> = {}
+    Object.keys(formData).forEach((key) => {
+      allTouched[key] = true
+    })
+    setTouched(allTouched)
+
     if (isFormValid()) {
       localStorage.setItem("antojitosquin-checkout", JSON.stringify(formData))
       router.push("/payment")
@@ -121,6 +129,20 @@ export default function CheckoutPage() {
         : "border-border focus:ring-primary/50",
       "focus:outline-none focus:ring-2",
     )
+
+  // --- Lógica de envío dinámico ---
+  const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
+  const formatShipping = shippingCost === 0 ? "Gratis" : formatPrice(shippingCost)
+  const totalWithShipping = totalPrice + shippingCost
+
+  let shippingMessage = ""
+  if (totalPrice < 50000) {
+    const diff = 50000 - totalPrice
+    shippingMessage = `¡Estás cerca! Solo ${formatPrice(diff)} más y tu pedido tendrá envío por solo 5.000 COP.`
+  } else if (totalPrice < 100000) {
+    const diff = 100000 - totalPrice
+    shippingMessage = `¡Casi llegas! Agrega ${formatPrice(diff)} más para disfrutar de envío gratis en tu pedido.`
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -268,14 +290,21 @@ export default function CheckoutPage() {
               <span>{items.length} productos</span>
               <span>{formatPrice(totalPrice)}</span>
             </div>
-            <div className="flex justify-between text-muted-foreground mb-3">
-              <span>Envío</span>
-              <span className="text-accent font-medium">Gratis</span>
+            <div className="flex flex-col mb-3">
+              <div className="flex justify-between text-muted-foreground">
+                <span>Envío</span>
+                <span className="text-accent font-medium">{formatShipping}</span>
+              </div>
+              {shippingMessage && (
+                <p className="text-sm font-semibold mt-1 text-green-600">
+                  {shippingMessage}
+                </p>
+              )}
             </div>
             <hr className="border-border mb-3" />
             <div className="flex justify-between font-bold text-lg text-foreground">
               <span>Total</span>
-              <span className="text-primary">{formatPrice(totalPrice)}</span>
+              <span className="text-primary">{formatPrice(totalWithShipping)}</span>
             </div>
           </div>
 

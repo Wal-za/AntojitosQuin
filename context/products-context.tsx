@@ -82,19 +82,35 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
     return products.filter((p) => normalize(p.categoria) === normalizedCategory)
   }
 
+  // Función para normalizar texto: minúsculas, sin tildes, sin espacios extras
+  const normalizeText = (text: string) =>
+    text
+      .normalize("NFD")                 
+      .replace(/[\u0300-\u036f]/g, "") 
+      .toLowerCase()
+      .trim();
+
   const searchProducts = (query: string) => {
-    const lower = query.toLowerCase().trim();
+    const normalizedQuery = normalizeText(query);
 
-    // Filtrar cada tipo de coincidencia
-    const byName = products.filter(p => p.nombre.toLowerCase().includes(lower));
-    const byCategory = products
-      .filter(p => p.categoria.toLowerCase().includes(lower) && !byName.includes(p));
-    const byDescription = products
-      .filter(p => p.descripcion.toLowerCase().includes(lower) && !byName.includes(p) && !byCategory.includes(p));
+    // Coincidencias exactas
+    const exactMatches = products.filter(p =>
+      [p.nombre, p.categoria, p.descripcion]
+        .some(field => normalizeText(field) === normalizedQuery)
+    );
 
-    // Unir todos los resultados en el orden deseado
-    return [...byName, ...byCategory, ...byDescription];
-  }
+    // Coincidencias parciales (solo los que no fueron exactos)
+    const partialMatches = products.filter(p => {
+      if (exactMatches.includes(p)) return false;
+
+      return [p.nombre, p.categoria, p.descripcion]
+        .some(field => normalizeText(field).includes(normalizedQuery));
+    });
+
+    // Unir resultados exactos y parciales
+    return [...exactMatches, ...partialMatches];
+  };
+
 
 
   const getOffersOfTheDay = () => {
