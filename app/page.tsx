@@ -19,18 +19,27 @@ export default function HomePage() {
 
   const [filteredProducts, setFilteredProducts] = useState(products)
 
+  // --- PAGINACIÓN ---
+  const [currentPage, setCurrentPage] = useState(1)
+  const productsPerPage = 20
+
+  const indexOfLastProduct = currentPage * productsPerPage
+  const indexOfFirstProduct = indexOfLastProduct - productsPerPage
+  const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct)
+  const totalPages = Math.ceil(filteredProducts.length / productsPerPage)
+
   useEffect(() => {
+    setCurrentPage(1) // Reinicia la página al cambiar búsqueda o categoría
+
     if (searchQuery) {
       setFilteredProducts(searchProducts(searchQuery))
       setSelectedCategory(null)
     } else if (selectedCategory) {
       setFilteredProducts(getProductsByCategory(selectedCategory))
     } else {
-      // Si selectedCategory es null → mostrar todos los productos
       setFilteredProducts(products)
     }
   }, [searchQuery, selectedCategory, products, searchProducts, getProductsByCategory])
-
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
@@ -82,11 +91,30 @@ export default function HomePage() {
               <p className="text-muted-foreground">{error}</p>
             </div>
           ) : filteredProducts.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filteredProducts.map((product) => (
-                <ProductCard key={product.id} product={product} />
-              ))}
-            </div>
+            <>
+              <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+                {currentProducts.map((product) => (
+                  <ProductCard key={product.id} product={product} />
+                ))}
+              </div>
+
+              {/* --- PAGINACIÓN --- */}
+              {totalPages > 1 && (
+                <div className="flex justify-center mt-6 space-x-2">
+                  {Array.from({ length: totalPages }, (_, i) => (
+                    <button
+                      key={i}
+                      onClick={() => setCurrentPage(i + 1)}
+                      className={`px-3 py-1 rounded ${
+                        currentPage === i + 1 ? "bg-primary text-white" : "bg-gray-200"
+                      }`}
+                    >
+                      {i + 1}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </>
           ) : (
             <div className="flex flex-col items-center justify-center py-16 text-center">
               <SearchX className="w-16 h-16 text-muted-foreground mb-4" />
