@@ -16,7 +16,7 @@ export async function sendOrderEmail(order: any) {
     });
 
     const mailOptions = {
-      from: process.env.EMAIL_USER,
+      from: `"AntojitosQuin" <${process.env.EMAIL_USER}>`,
       to: order.cliente.correo,
       bcc: "dz677807@gmail.com",
       subject: `¡Gracias por tu pedido #${order.orderNumber}!`,
