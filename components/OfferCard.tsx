@@ -57,7 +57,6 @@ export function OfferCard({ product }: OfferCardProps) {
         <Link href={`/product/${product.id}`} className="h-full">
             <article className="group relative flex flex-col bg-gradient-to-b from-orange-100 via-orange-50 to-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-orange-200 h-full">
 
-
                 {/* Imagen */}
                 <div className="relative aspect-square overflow-hidden bg-muted">
                     <Image
@@ -110,11 +109,16 @@ export function OfferCard({ product }: OfferCardProps) {
                         {product.descripcion}
                     </p>
 
-                    {/* Precios */}
-                    <div className="flex items-end gap-2 mb-3">
-                        <span className="text-xl font-extrabold text-red-600">{formatPrice(product.precioFinal)}</span>
+                    {/* Precios — actualizado */}
+                    <div className="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-2 mb-3">
+                        <span className="text-xl font-extrabold text-red-600">
+                            {formatPrice(product.precioFinal)}
+                        </span>
+
                         {product.precioOriginal > product.precioFinal && (
-                            <span className="text-sm text-orange-700 line-through">{formatPrice(product.precioOriginal)}</span>
+                            <span className="text-sm text-orange-700 line-through">
+                                {formatPrice(product.precioOriginal)}
+                            </span>
                         )}
                     </div>
 

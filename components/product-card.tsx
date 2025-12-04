@@ -63,6 +63,7 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link href={`/product/${product.id}`} className="h-full">
       <article className="group bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-border hover:border-primary/30 animate-slide-up flex flex-col h-full">
+        
         {/* Imagen */}
         <div className="relative aspect-square overflow-hidden bg-muted">
           <Image
@@ -115,11 +116,14 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.descripcion}
           </p>
 
-          {/* Precios */}
-          <div className="flex items-end gap-2 mb-3">
-            <span className="text-xl font-bold text-primary">{formatPrice(product.precioFinal)}</span>
+          {/* Precios — actualizado para responsive */}
+          <div className="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-2 mb-3">
+            <span className="text-xl font-bold text-primary">
+              {formatPrice(product.precioFinal)}
+            </span>
+
             {product.precioOriginal > product.precioFinal && (
-              <span className="text-sm text-muted-foreground line-through">
+              <span className="text-sm text-muted-foreground line-through sm:ml-1">
                 {formatPrice(product.precioOriginal)}
               </span>
             )}
