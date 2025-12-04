@@ -1,4 +1,6 @@
 import nodemailer from "nodemailer";
+import path from "path";
+
 
 export async function sendOrderEmail(order: any) {
   try {
@@ -14,6 +16,9 @@ export async function sendOrderEmail(order: any) {
         rejectUnauthorized: false
       }
     });
+
+    const faviconPath = path.join(__dirname, 'public', 'favicon.png');
+
 
     const mailOptions = {
       from: `"AntojitosQuin" <${process.env.EMAIL_USER}>`,
@@ -77,7 +82,7 @@ export async function sendOrderEmail(order: any) {
       attachments: [
         {
           filename: 'favicon.png',
-          path: './public/favicon.png',
+          path: faviconPath,
           cid: 'logo'
         }
       ]
