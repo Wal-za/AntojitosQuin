@@ -66,24 +66,24 @@ export function OfferCard({ product }: OfferCardProps) {
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
                     />
 
-                    {/* Badge de descuento estilo ProductCard */}
+                    {/* Badge de descuento (reducido y más hacia el borde) */}
                     {discount > 0 && (
-                        <div className="absolute top-3 left-3 bg-red-500 text-white font-bold text-xs px-2 py-1 rounded-md shadow-md">
+                        <div className="absolute top-2 left-2 bg-red-500 text-white font-semibold text-[10px] px-1.5 py-0.5 rounded-md shadow-md">
                             -{discount}%
                         </div>
                     )}
 
-                    {/* Etiqueta del producto */}
+                    {/* Etiqueta del producto (texto más pequeño y mejor posición) */}
                     {product.etiqueta && (
                         <div className={cn(
-                            "absolute top-3 right-3 px-2 py-1 rounded-full text-xs font-semibold shadow-sm",
+                            "absolute top-2 right-2 px-1.5 py-0.5 rounded-full text-[10px] font-semibold shadow-sm",
                             getEtiquetaStyle(product.etiqueta)
                         )}>
                             {product.etiqueta}
                         </div>
                     )}
 
-                    {/* Botón rápido agregar */}
+                    {/* Botón agregar rápido */}
                     <button
                         onClick={handleAddToCart}
                         className={cn(
@@ -99,17 +99,16 @@ export function OfferCard({ product }: OfferCardProps) {
 
                 {/* Contenido */}
                 <div className="p-4 flex-1 flex flex-col">
-                    {/* Nombre */}
+
                     <h3 className="font-bold text-lg text-orange-900 group-hover:text-orange-700 transition-colors line-clamp-2">
                         {product.nombre}
                     </h3>
 
-                    {/* Descripción */}
                     <p className="text-sm text-orange-800 line-clamp-3 flex-1 mb-3">
                         {product.descripcion}
                     </p>
 
-                    {/* Precios — actualizado */}
+                    {/* Precios */}
                     <div className="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-2 mb-3">
                         <span className="text-xl font-extrabold text-red-600">
                             {formatPrice(product.precioFinal)}

@@ -73,18 +73,18 @@ export function ProductCard({ product }: ProductCardProps) {
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
 
-          {/* Badge de descuento */}
+          {/* Badge de descuento (más pequeño y más al borde) */}
           {discount > 0 && (
-            <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground px-2 py-1 rounded-md text-xs font-bold">
+            <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-md text-[11px] font-semibold shadow-sm">
               -{discount}%
             </div>
           )}
 
-          {/* Badge de etiqueta */}
+          {/* Badge de etiqueta (más pequeño y ajustado) */}
           {product.etiqueta && (
             <div
               className={cn(
-                "absolute top-2 right-2 px-2 py-1 rounded-md text-xs font-semibold",
+                "absolute top-2 right-2 px-1.5 py-0.5 rounded-md text-[11px] font-semibold shadow-sm",
                 getEtiquetaStyle(product.etiqueta)
               )}
             >
@@ -116,7 +116,7 @@ export function ProductCard({ product }: ProductCardProps) {
             {product.descripcion}
           </p>
 
-          {/* Precios — actualizado para responsive */}
+          {/* Precios */}
           <div className="flex flex-col sm:flex-row sm:items-end gap-1 sm:gap-2 mb-3">
             <span className="text-xl font-bold text-primary">
               {formatPrice(product.precioFinal)}
