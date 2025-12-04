@@ -17,7 +17,7 @@ export async function sendOrderEmail(order: any) {
       }
     });
 
-    const faviconPath = path.join(__dirname, 'public', 'favicon.png');
+    const faviconPath = path.join(__dirname, 'favicon.png');
 
 
     const mailOptions = {
