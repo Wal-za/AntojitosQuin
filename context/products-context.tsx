@@ -85,8 +85,8 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
   // Función para normalizar texto: minúsculas, sin tildes, sin espacios extras
   const normalizeText = (text: string) =>
     text
-      .normalize("NFD")                 
-      .replace(/[\u0300-\u036f]/g, "") 
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
       .toLowerCase()
       .trim();
 
@@ -99,7 +99,18 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
         .some(field => normalizeText(field) === normalizedQuery)
     );
 
-    // Coincidencias parciales (solo los que no fueron exactos)
+    // Coincidencias exactas ordenadas por prioridad (nombre → categoría → descripción)
+    const sortedExact = [...exactMatches].sort((a, b) => {
+      const getPriority = (p: any) => {
+        const n = normalizeText(p.nombre) === normalizedQuery ? 1 :
+          normalizeText(p.categoria) === normalizedQuery ? 2 :
+            normalizeText(p.descripcion) === normalizedQuery ? 3 : 4;
+        return n;
+      };
+      return getPriority(a) - getPriority(b);
+    });
+
+    // Coincidencias parciales (solo las que no fueron exactas)
     const partialMatches = products.filter(p => {
       if (exactMatches.includes(p)) return false;
 
@@ -107,9 +118,21 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
         .some(field => normalizeText(field).includes(normalizedQuery));
     });
 
-    // Unir resultados exactos y parciales
-    return [...exactMatches, ...partialMatches];
+    // Ordenar parciales también: nombre → categoría → descripción
+    const sortedPartial = [...partialMatches].sort((a, b) => {
+      const getPriority = (p: any) => {
+        const n = normalizeText(p.nombre).includes(normalizedQuery) ? 1 :
+          normalizeText(p.categoria).includes(normalizedQuery) ? 2 :
+            normalizeText(p.descripcion).includes(normalizedQuery) ? 3 : 4;
+        return n;
+      };
+      return getPriority(a) - getPriority(b);
+    });
+
+    // Unir resultados exactos y parciales ya ordenados
+    return [...sortedExact, ...sortedPartial];
   };
+
 
 
 
