@@ -37,7 +37,6 @@ export default function CheckoutPage() {
   const [errors, setErrors] = useState<FormErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
 
-  // --- Nueva funcionalidad: Departamento / Ciudad ---
   const [departamento, setDepartamento] = useState("")
   const [ciudad, setCiudad] = useState("")
   const departamentos = {
@@ -69,11 +68,9 @@ export default function CheckoutPage() {
     "Putumayo": ["Mocoa", "Puerto Asís", "Puerto Caicedo", "Orito", "Villagarzón"]
   };
 
-  // --- Nueva funcionalidad: Política de datos ---
   const [policyAccepted, setPolicyAccepted] = useState(false)
   const [showPolicyModal, setShowPolicyModal] = useState(false)
 
-  // Redirección si el carrito está vacío
   useEffect(() => {
     if (items.length === 0) {
       router.push("/cart")
@@ -124,7 +121,6 @@ export default function CheckoutPage() {
       }
     })
 
-    // Validación extra: departamento, ciudad
     if (!departamento) {
       newErrors.departamento = "Debes seleccionar un departamento"
       isValid = false
@@ -141,7 +137,6 @@ export default function CheckoutPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Marcar todos los campos como touched
     const allTouched: Record<string, boolean> = {}
     Object.keys(formData).forEach((key) => { allTouched[key] = true })
     allTouched["departamento"] = true
@@ -185,16 +180,22 @@ export default function CheckoutPage() {
     )
 
   const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
-  const formatShipping = shippingCost === 0 ? "Gratis" : formatPrice(shippingCost)
+  const formatShipping = shippingCost === 0 
+    ? <span className="font-bold text-green-600">Gratis</span> 
+    : formatPrice(shippingCost)
   const totalWithShipping = totalPrice + shippingCost
 
   let shippingMessage = ""
   if (totalPrice < 50000) {
     const diff = 50000 - totalPrice
-    shippingMessage = `¡Estás cerca! Solo ${formatPrice(diff)} más y tu pedido tendrá envío por solo 5.000 COP.`
+    shippingMessage = `¡Estás cerca! Solo ` + 
+      `<span class="font-bold text-yellow-600">${formatPrice(diff)}</span>` + 
+      ` más y tu pedido tendrá envío por solo 5.000 COP.`
   } else if (totalPrice < 100000) {
     const diff = 100000 - totalPrice
-    shippingMessage = `¡Casi llegas! Agrega ${formatPrice(diff)} más para disfrutar de envío gratis en tu pedido.`
+    shippingMessage = `¡Casi llegas! Agrega ` + 
+      `<span class="font-bold text-yellow-600">${formatPrice(diff)}</span>` + 
+      ` más para disfrutar de envío gratis en tu pedido.`
   }
 
   return (
@@ -292,36 +293,43 @@ export default function CheckoutPage() {
               </div>
               {errors.correo && touched.correo && <p className="mt-1 text-sm text-destructive">{errors.correo}</p>}
             </div>
+          </div>
 
-            {/* Política de datos */}
-            <div className="flex items-start gap-2">
-              <input type="checkbox" id="policy" checked={policyAccepted} onChange={() => setPolicyAccepted(!policyAccepted)} className="mt-1 h-4 w-4 rounded border-border accent-primary" />
-              <label htmlFor="policy" className="text-sm text-foreground">
-                Acepto la <span className="text-primary cursor-pointer" onClick={() => setShowPolicyModal(true)}>política de datos</span>
-              </label>
+          {/* Shipping & Total */}
+          <div className="bg-card rounded-xl border border-border p-6 space-y-4">
+            {shippingMessage && (
+              <p className="text-sm text-yellow-600" dangerouslySetInnerHTML={{ __html: shippingMessage }}></p>
+            )}
+            <div className="flex justify-between text-sm">
+              <span>Subtotal:</span>
+              <span>{formatPrice(totalPrice)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Envío:</span>
+              <span>{formatShipping}</span>
+            </div>
+            <div className="flex justify-between font-bold text-lg">
+              <span>Total:</span>
+              <span>{formatPrice(totalWithShipping)}</span>
             </div>
           </div>
 
-          {/* Resumen de envío */}
-          <div className="bg-card rounded-xl border border-border p-6 space-y-2">
-            <div className="flex justify-between"><span>Subtotal:</span><span>{formatPrice(totalPrice)}</span></div>
-            <div className="flex justify-between"><span>Envío:</span><span>{formatShipping}</span></div>
-            <div className="flex justify-between font-bold text-foreground"><span>Total:</span><span>{formatPrice(totalWithShipping)}</span></div>
-            {shippingMessage && <p className="text-xs text-muted-foreground mt-2">{shippingMessage}</p>}
+          {/* Política de datos */}
+          <div className="flex items-center gap-2">
+            <input type="checkbox" id="policy" checked={policyAccepted} onChange={() => setPolicyAccepted(!policyAccepted)} />
+            <label htmlFor="policy" className="text-sm text-foreground">Acepto la <button type="button" onClick={() => setShowPolicyModal(true)} className="text-primary underline">política de datos</button></label>
           </div>
 
-          <button type="submit" disabled={!policyAccepted} className={cn("w-full py-3 rounded-xl text-white font-bold transition-colors", !policyAccepted ? "bg-muted cursor-not-allowed" : "bg-primary hover:bg-primary/90")}>
-            Continuar al pago
-          </button>
+          <button type="submit" disabled={!policyAccepted} className="w-full py-3 px-6 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed">Continuar</button>
         </form>
 
-        {/* Modal de política */}
+        {/* Modal */}
         {showPolicyModal && (
-          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
-            <div className="bg-background p-6 rounded-xl max-w-lg w-full relative">
-              <h2 className="text-lg font-bold mb-4">Política de Datos</h2>
-              <p className="text-sm text-foreground mb-4">Aquí va la política de datos de tu tienda...</p>
-              <button onClick={() => setShowPolicyModal(false)} className="absolute top-3 right-3 text-foreground">Cerrar</button>
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-xl max-w-lg w-full">
+              <h2 className="text-xl font-bold mb-4">Política de Datos</h2>
+              <p className="mb-4">Aquí va la política de tratamiento de datos.</p>
+              <button onClick={() => setShowPolicyModal(false)} className="px-4 py-2 bg-primary text-white rounded-lg">Cerrar</button>
             </div>
           </div>
         )}

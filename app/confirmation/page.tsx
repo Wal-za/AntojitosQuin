@@ -108,6 +108,16 @@ export default function ConfirmationPage() {
 
             <hr className="border-border my-4" />
 
+            {/* Envío */}
+            <div className="flex justify-between text-sm mb-2">
+              <span className="text-foreground font-semibold">Envío</span>
+              <span className={cn("font-semibold", order.shipping === 0 ? "text-green-600" : "text-foreground")}>
+                {order.shipping === 0 ? "Gratis" : formatPrice(order.shipping)}
+              </span>
+            </div>
+
+            <hr className="border-border my-4" />
+
             <div className="flex justify-between font-bold text-lg">
               <span className="text-foreground">Total pagado</span>
               <span className="text-primary">{formatPrice(order.total)}</span>

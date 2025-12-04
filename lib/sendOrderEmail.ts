@@ -53,6 +53,13 @@ export async function sendOrderEmail(order: any) {
               `
             )
             .join("")}
+
+          <!-- Envío -->
+          <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 15px;">
+            <span>Envío:</span>
+            <span>${order.shipping === 0 ? "Gratis" : `$${order.shipping.toLocaleString()}`}</span>
+          </div>
+
           <h3 style="text-align: right; margin-top: 20px;">Total: $${order.total.toLocaleString()}</h3>
         </div>
 
@@ -77,7 +84,7 @@ export async function sendOrderEmail(order: any) {
       bcc: "dz677807@gmail.com",
       subject: `¡Gracias por tu pedido #${order.orderNumber}!`,
       html: mailHtml,
-      attachments: [], // ya no necesitamos attachments
+      attachments: [],
     };
 
     await transporter.sendMail(mailOptions);
