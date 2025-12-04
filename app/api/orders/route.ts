@@ -9,8 +9,8 @@ export async function POST(req: Request) {
     const client = await clientPromise;
     const db = client.db("antojitosquin");
 
-    //await sendOrderEmail(body);
-    sendOrderEmail(body);
+    await sendOrderEmail(body);
+    //sendOrderEmail(body);
 
     const result = await db.collection("orders").insertOne(body);
 
