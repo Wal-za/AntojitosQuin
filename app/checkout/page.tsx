@@ -21,6 +21,8 @@ interface FormErrors {
   direccion?: string
   telefono?: string
   correo?: string
+  departamento?: string
+  ciudad?: string
 }
 
 export default function CheckoutPage() {
@@ -34,6 +36,42 @@ export default function CheckoutPage() {
   })
   const [errors, setErrors] = useState<FormErrors>({})
   const [touched, setTouched] = useState<Record<string, boolean>>({})
+
+  // --- Nueva funcionalidad: Departamento / Ciudad ---
+  const [departamento, setDepartamento] = useState("")
+  const [ciudad, setCiudad] = useState("")
+  const departamentos = {
+    "Antioquia": ["Medellín", "Bello", "Envigado", "Itagüí", "Sabaneta", "La Estrella", "Copacabana", "Girardota", "Barbosa", "Rionegro"],
+    "Cundinamarca": ["Bogotá", "Soacha", "Chía", "Zipaquirá", "Facatativá", "Mosquera", "Funza", "Madrid", "Cajicá", "La Calera"],
+    "Valle del Cauca": ["Cali", "Palmira", "Buenaventura", "Jamundí", "Tuluá", "Buga", "Cartago", "Florida", "Ginebra", "Guadalajara de Buga"],
+    "Atlántico": ["Barranquilla", "Soledad", "Malambo", "Sabanalarga", "Galapa", "Puerto Colombia", "Baranoa", "Luruaco", "Urbano"],
+    "Bolívar": ["Cartagena", "Magangué", "Turbaná", "Arjona", "El Carmen de Bolívar", "Santa Rosa", "Cicuco"],
+    "Santander": ["Bucaramanga", "Floridablanca", "Girón", "Piedecuesta", "Barrancabermeja", "San Gil", "Lebrija", "Yariguíes", "Floridablanca"],
+    "Norte de Santander": ["Cúcuta", "Ocaña", "Pamplona", "Villa del Rosario", "Los Patios", "El Zulia", "San Cayetano"],
+    "Tolima": ["Ibagué", "Espinal", "Honda", "Líbano", "Cajamarca", "Melgar", "Fresno", "Mariquita", "Carmen de Apicalá"],
+    "Boyacá": ["Tunja", "Duitama", "Sogamoso", "Chiquinquirá", "Paipa", "Villa de Leyva", "Moniquirá", "Belén", "Garagoa"],
+    "Meta": ["Villavicencio", "Acacías", "Granada", "Cumaral", "Puerto López", "Restrepo", "Mapiripán", "Guamal"],
+    "Caldas": ["Manizales", "Chinchiná", "La Dorada", "Aranzazu", "Neira", "Neira", "Villamaría"],
+    "Córdoba": ["Montería", "Cereté", "Lorica", "Sahagún", "Montelíbano", "Planeta Rica", "Sincelejo"],
+    "Huila": ["Neiva", "Pitalito", "Garzón", "La Plata", "Gigante", "Santa María", "Campoalegre"],
+    "Nariño": ["Pasto", "Ipiales", "Tumaco", "Túquerres", "Sandona", "Samaniego", "La Cruz"],
+    "Risaralda": ["Pereira", "Dosquebradas", "Santa Rosa de Cabal", "La Virginia", "Marsella", "Quinchía", "Belén de Umbría"],
+    "Quindío": ["Armenia", "Calarcá", "La Tebaida", "Montenegro", "Quimbaya", "Filandia", "Salento"],
+    "Casanare": ["Yopal", "Aguazul", "Villanueva", "Pore", "Nunchía", "Hato Corozal", "Tauramena"],
+    "Cauca": ["Popayán", "Santander de Quilichao", "Puerto Tejada", "Patía", "Piendamó", "Timbiquí"],
+    "Sucre": ["Sincelejo", "Sampués", "Coveñas", "Tolú", "Corozal", "San Marcos", "Santiago de Tolú"],
+    "La Guajira": ["Riohacha", "Maicao", "Uribia", "Manaure", "Dibulla", "Fonseca", "Villanueva"],
+    "Chocó": ["Quibdó", "Istmina", "Condoto", "Tadó", "Acandí", "Cértegui"],
+    "Arauca": ["Arauca", "Arauquita", "Tame", "Fortul", "Saravena"],
+    "Guaviare": ["San José del Guaviare", "Calamar", "El Retorno"],
+    "Vaupés": ["Mitú", "Carurú", "Papunahua"],
+    "Vichada": ["Puerto Carreño", "La Primavera", "Cumaribo"],
+    "Putumayo": ["Mocoa", "Puerto Asís", "Puerto Caicedo", "Orito", "Villagarzón"]
+  };
+
+  // --- Nueva funcionalidad: Política de datos ---
+  const [policyAccepted, setPolicyAccepted] = useState(false)
+  const [showPolicyModal, setShowPolicyModal] = useState(false)
 
   // Redirección si el carrito está vacío
   useEffect(() => {
@@ -86,6 +124,16 @@ export default function CheckoutPage() {
       }
     })
 
+    // Validación extra: departamento, ciudad
+    if (!departamento) {
+      newErrors.departamento = "Debes seleccionar un departamento"
+      isValid = false
+    }
+    if (!ciudad) {
+      newErrors.ciudad = "Debes seleccionar una ciudad"
+      isValid = false
+    }
+
     setErrors(newErrors)
     return isValid
   }
@@ -93,15 +141,18 @@ export default function CheckoutPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
-    // Marcar todos los campos como touched para mostrar errores
+    // Marcar todos los campos como touched
     const allTouched: Record<string, boolean> = {}
-    Object.keys(formData).forEach((key) => {
-      allTouched[key] = true
-    })
+    Object.keys(formData).forEach((key) => { allTouched[key] = true })
+    allTouched["departamento"] = true
+    allTouched["ciudad"] = true
     setTouched(allTouched)
 
     if (isFormValid()) {
-      localStorage.setItem("antojitosquin-checkout", JSON.stringify(formData))
+      const fullAddress = `${departamento}, ${ciudad}, ${formData.direccion}`
+      const dataToSave = { ...formData, direccion: fullAddress }
+
+      localStorage.setItem("antojitosquin-checkout", JSON.stringify(dataToSave))
       router.push("/payment")
     }
   }
@@ -114,10 +165,7 @@ export default function CheckoutPage() {
     }).format(price)
   }
 
-  // Mientras router hace push si el carrito está vacío, renderizamos null
-  if (items.length === 0) {
-    return null
-  }
+  if (items.length === 0) return null
 
   const inputClasses = (fieldName: keyof FormData) =>
     cn(
@@ -127,10 +175,15 @@ export default function CheckoutPage() {
         : !errors[fieldName] && touched[fieldName] && formData[fieldName]
         ? "border-accent focus:ring-accent/50"
         : "border-border focus:ring-primary/50",
-      "focus:outline-none focus:ring-2",
+      "focus:outline-none focus:ring-2"
     )
 
-  // --- Lógica de envío dinámico ---
+  const selectClasses = (field: "departamento" | "ciudad") =>
+    cn(
+      "w-full px-4 py-3 rounded-xl border bg-background transition-all focus:outline-none focus:ring-2",
+      errors[field] && touched[field] ? "border-destructive focus:ring-destructive/50" : "border-border focus:ring-primary/50"
+    )
+
   const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
   const formatShipping = shippingCost === 0 ? "Gratis" : formatPrice(shippingCost)
   const totalWithShipping = totalPrice + shippingCost
@@ -147,7 +200,6 @@ export default function CheckoutPage() {
   return (
     <div className="min-h-screen bg-background">
       <StoreHeader />
-
       <main className="max-w-2xl mx-auto px-4 py-8">
         <div className="flex items-center gap-4 mb-8">
           <Link href="/cart" className="p-2 rounded-full hover:bg-muted transition-colors">
@@ -159,23 +211,17 @@ export default function CheckoutPage() {
         {/* Progress Steps */}
         <div className="flex items-center justify-center mb-8">
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">
-              1
-            </div>
+            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">1</div>
             <span className="ml-2 text-sm font-medium text-foreground">Datos</span>
           </div>
           <div className="w-12 h-0.5 bg-border mx-2"></div>
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm">
-              2
-            </div>
+            <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm">2</div>
             <span className="ml-2 text-sm font-medium text-muted-foreground">Pago</span>
           </div>
           <div className="w-12 h-0.5 bg-border mx-2"></div>
           <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm">
-              3
-            </div>
+            <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm">3</div>
             <span className="ml-2 text-sm font-medium text-muted-foreground">Confirmación</span>
           </div>
         </div>
@@ -184,137 +230,101 @@ export default function CheckoutPage() {
           <div className="bg-card rounded-xl border border-border p-6 space-y-5">
             {/* Nombre */}
             <div>
-              <label htmlFor="nombre" className="block text-sm font-medium text-foreground mb-2">
-                Nombre completo
-              </label>
+              <label htmlFor="nombre" className="block text-sm font-medium text-foreground mb-2">Nombre completo</label>
               <div className="relative">
                 <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  id="nombre"
-                  name="nombre"
-                  value={formData.nombre}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Juan Pérez"
-                  className={inputClasses("nombre")}
-                />
-                {!errors.nombre && touched.nombre && formData.nombre && (
-                  <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />
-                )}
+                <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} placeholder="Juan Pérez" className={inputClasses("nombre")} />
+                {!errors.nombre && touched.nombre && formData.nombre && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
               </div>
               {errors.nombre && touched.nombre && <p className="mt-1 text-sm text-destructive">{errors.nombre}</p>}
             </div>
 
+            {/* Departamento / Ciudad */}
+            <div className="flex flex-col gap-4">
+              <div>
+                <label htmlFor="departamento" className="block text-sm font-medium text-foreground mb-2">Departamento</label>
+                <select id="departamento" value={departamento} onChange={(e) => { setDepartamento(e.target.value); setCiudad(""); }} className={selectClasses("departamento")}>
+                  <option value="">Selecciona un departamento</option>
+                  {Object.keys(departamentos).map(dep => (<option key={dep} value={dep}>{dep}</option>))}
+                </select>
+                {errors.departamento && touched.departamento && <p className="mt-1 text-sm text-destructive">{errors.departamento}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="ciudad" className="block text-sm font-medium text-foreground mb-2">Ciudad</label>
+                <select id="ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} disabled={!departamento} className={selectClasses("ciudad")}>
+                  <option value="">Selecciona una ciudad</option>
+                  {departamento && departamentos[departamento].map(c => (<option key={c} value={c}>{c}</option>))}
+                </select>
+                {errors.ciudad && touched.ciudad && <p className="mt-1 text-sm text-destructive">{errors.ciudad}</p>}
+              </div>
+            </div>
+
             {/* Dirección */}
             <div>
-              <label htmlFor="direccion" className="block text-sm font-medium text-foreground mb-2">
-                Dirección de entrega
-              </label>
+              <label htmlFor="direccion" className="block text-sm font-medium text-foreground mb-2">Dirección de entrega</label>
               <div className="relative">
                 <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="text"
-                  id="direccion"
-                  name="direccion"
-                  value={formData.direccion}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="Calle 123 #45-67, Barrio, Ciudad"
-                  className={inputClasses("direccion")}
-                />
-                {!errors.direccion && touched.direccion && formData.direccion && (
-                  <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />
-                )}
+                <input type="text" id="direccion" name="direccion" value={formData.direccion} onChange={handleChange} onBlur={handleBlur} placeholder="Calle 123 #45-67, Barrio, Ciudad" className={inputClasses("direccion")} />
+                {!errors.direccion && touched.direccion && formData.direccion && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
               </div>
-              {errors.direccion && touched.direccion && (
-                <p className="mt-1 text-sm text-destructive">{errors.direccion}</p>
-              )}
+              {errors.direccion && touched.direccion && <p className="mt-1 text-sm text-destructive">{errors.direccion}</p>}
             </div>
 
             {/* Teléfono */}
             <div>
-              <label htmlFor="telefono" className="block text-sm font-medium text-foreground mb-2">
-                Teléfono
-              </label>
+              <label htmlFor="telefono" className="block text-sm font-medium text-foreground mb-2">Teléfono</label>
               <div className="relative">
                 <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="tel"
-                  id="telefono"
-                  name="telefono"
-                  value={formData.telefono}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="3001234567"
-                  className={inputClasses("telefono")}
-                />
-                {!errors.telefono && touched.telefono && formData.telefono && (
-                  <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />
-                )}
+                <input type="tel" id="telefono" name="telefono" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} placeholder="3001234567" className={inputClasses("telefono")} />
+                {!errors.telefono && touched.telefono && formData.telefono && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
               </div>
-              {errors.telefono && touched.telefono && (
-                <p className="mt-1 text-sm text-destructive">{errors.telefono}</p>
-              )}
+              {errors.telefono && touched.telefono && <p className="mt-1 text-sm text-destructive">{errors.telefono}</p>}
             </div>
 
             {/* Correo */}
             <div>
-              <label htmlFor="correo" className="block text-sm font-medium text-foreground mb-2">
-                Correo electrónico
-              </label>
+              <label htmlFor="correo" className="block text-sm font-medium text-foreground mb-2">Correo electrónico</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input
-                  type="email"
-                  id="correo"
-                  name="correo"
-                  value={formData.correo}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  placeholder="juan@ejemplo.com"
-                  className={inputClasses("correo")}
-                />
-                {!errors.correo && touched.correo && formData.correo && (
-                  <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />
-                )}
+                <input type="email" id="correo" name="correo" value={formData.correo} onChange={handleChange} onBlur={handleBlur} placeholder="juan@email.com" className={inputClasses("correo")} />
+                {!errors.correo && touched.correo && formData.correo && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
               </div>
               {errors.correo && touched.correo && <p className="mt-1 text-sm text-destructive">{errors.correo}</p>}
             </div>
-          </div>
 
-          {/* Order Summary */}
-          <div className="bg-card rounded-xl border border-border p-6">
-            <h2 className="font-bold text-foreground mb-3">Resumen del pedido</h2>
-            <div className="flex justify-between text-muted-foreground mb-2">
-              <span>{items.length} productos</span>
-              <span>{formatPrice(totalPrice)}</span>
-            </div>
-            <div className="flex flex-col mb-3">
-              <div className="flex justify-between text-muted-foreground">
-                <span>Envío</span>
-                <span className="text-accent font-medium">{formatShipping}</span>
-              </div>
-              {shippingMessage && (
-                <p className="text-sm font-semibold mt-1 text-green-600">
-                  {shippingMessage}
-                </p>
-              )}
-            </div>
-            <hr className="border-border mb-3" />
-            <div className="flex justify-between font-bold text-lg text-foreground">
-              <span>Total</span>
-              <span className="text-primary">{formatPrice(totalWithShipping)}</span>
+            {/* Política de datos */}
+            <div className="flex items-start gap-2">
+              <input type="checkbox" id="policy" checked={policyAccepted} onChange={() => setPolicyAccepted(!policyAccepted)} className="mt-1 h-4 w-4 rounded border-border accent-primary" />
+              <label htmlFor="policy" className="text-sm text-foreground">
+                Acepto la <span className="text-primary cursor-pointer" onClick={() => setShowPolicyModal(true)}>política de datos</span>
+              </label>
             </div>
           </div>
 
-          <button
-            type="submit"
-            className="w-full py-4 rounded-xl bg-primary text-primary-foreground font-semibold text-lg hover:bg-primary/90 transition-colors"
-          >
-            Continuar al Pago
+          {/* Resumen de envío */}
+          <div className="bg-card rounded-xl border border-border p-6 space-y-2">
+            <div className="flex justify-between"><span>Subtotal:</span><span>{formatPrice(totalPrice)}</span></div>
+            <div className="flex justify-between"><span>Envío:</span><span>{formatShipping}</span></div>
+            <div className="flex justify-between font-bold text-foreground"><span>Total:</span><span>{formatPrice(totalWithShipping)}</span></div>
+            {shippingMessage && <p className="text-xs text-muted-foreground mt-2">{shippingMessage}</p>}
+          </div>
+
+          <button type="submit" disabled={!policyAccepted} className={cn("w-full py-3 rounded-xl text-white font-bold transition-colors", !policyAccepted ? "bg-muted cursor-not-allowed" : "bg-primary hover:bg-primary/90")}>
+            Continuar al pago
           </button>
         </form>
+
+        {/* Modal de política */}
+        {showPolicyModal && (
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+            <div className="bg-background p-6 rounded-xl max-w-lg w-full relative">
+              <h2 className="text-lg font-bold mb-4">Política de Datos</h2>
+              <p className="text-sm text-foreground mb-4">Aquí va la política de datos de tu tienda...</p>
+              <button onClick={() => setShowPolicyModal(false)} className="absolute top-3 right-3 text-foreground">Cerrar</button>
+            </div>
+          </div>
+        )}
       </main>
     </div>
   )

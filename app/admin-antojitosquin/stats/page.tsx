@@ -177,47 +177,46 @@ export default function AdminStatsPage() {
         </div>
 
         {/* Top Products */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <div className="flex items-center gap-2 mb-6">
-            <Award className="w-5 h-5 text-primary" />
-            <h2 className="text-lg font-bold text-foreground">Productos Más Vendidos</h2>
-          </div>
+       <div className="bg-card rounded-xl border border-border p-6">
+  <div className="flex items-center gap-2 mb-6">
+    <Award className="w-5 h-5 text-primary" />
+    <h2 className="text-lg font-bold text-foreground">Productos Más Vendidos</h2>
+  </div>
 
-          {topProducts.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="text-left text-muted-foreground border-b border-border">
-                    <th className="pb-3 font-medium w-6">#</th>
-                    <th className="pb-3 font-medium">Producto</th>
-                    <th className="pb-3 font-medium">Unidades</th>
-                    <th className="pb-3 font-medium">Ingresos</th>
-                    <th className="pb-3 font-medium">Ganancia</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {topProducts.map((product, index) => {
-                    const productProfit = product.ingresos - product.precioCompra * product.cantidad
+  {topProducts.length > 0 ? (
+    <div className="overflow-x-auto">
+      <table className="w-full text-sm table-auto">
+        <thead>
+          <tr className="text-left text-muted-foreground border-b border-border">
+            <th className="pb-3 font-medium min-w-[120px] text-left">Producto</th>
+            <th className="pb-3 font-medium w-12 text-center">Und</th>
+            <th className="pb-3 font-medium min-w-[80px] text-center">Ventas</th>
+            <th className="pb-3 font-medium min-w-[80px] text-center">Ganancia</th>
+          </tr>
+        </thead>
+        <tbody>
+          {topProducts.map((product, index) => {
+            const productProfit = product.ingresos - product.precioCompra * product.cantidad;
 
-                    return (
-                      <tr key={product.nombre} className="border-b border-border last:border-0">
-                        <td className="py-2">{index + 1}</td>
-                        <td className="py-2 font-medium text-foreground">{product.nombre}</td>
-                        <td className="py-2 text-foreground">{product.cantidad}</td>
-                        <td className="py-2 font-medium text-primary">{formatPrice(product.ingresos)}</td>
-                        <td className="py-2 font-medium text-green-700">{formatPrice(productProfit)}</td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <p className="text-muted-foreground text-center py-8">
-              Aún no hay ventas registradas. Los datos aparecerán cuando se realicen pedidos.
-            </p>
-          )}
-        </div>
+            return (
+              <tr key={product.nombre} className="border-b border-border last:border-0">
+                <td className="py-2 font-medium text-foreground text-left">{product.nombre}</td>
+                <td className="py-2 text-center text-foreground">{product.cantidad}</td>
+                <td className="py-2 font-medium text-primary text-center">{formatPrice(product.ingresos)}</td>
+                <td className="py-2 font-medium text-green-700 text-center">{formatPrice(productProfit)}</td>
+              </tr>
+            );
+          })}
+        </tbody>
+      </table>
+    </div>
+  ) : (
+    <p className="text-muted-foreground text-center py-8">
+      Aún no hay ventas registradas. Los datos aparecerán cuando se realicen pedidos.
+    </p>
+  )}
+</div>
+
       </div>
     </AdminLayout>
   )
