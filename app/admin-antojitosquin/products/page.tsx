@@ -594,7 +594,7 @@ export default function AdminProductsPage() {
                         }));
                       }}
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
-                      required
+                      
                     />
                   </div>
 
