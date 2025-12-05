@@ -71,7 +71,12 @@ export default function CheckoutPage() {
   const [policyAccepted, setPolicyAccepted] = useState(false)
   const [showPolicyModal, setShowPolicyModal] = useState(false)
 
+  // Recuperar los datos del formulario desde sessionStorage al cargar la página
   useEffect(() => {
+    const storedFormData = sessionStorage.getItem("checkout-form-data")
+    if (storedFormData) {
+      setFormData(JSON.parse(storedFormData))
+    }
     if (items.length === 0) {
       router.push("/cart")
     }
@@ -94,7 +99,14 @@ export default function CheckoutPage() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
-    setFormData((prev) => ({ ...prev, [name]: value }))
+    setFormData((prev) => {
+      const updatedData = { ...prev, [name]: value }
+
+      // Guardar los datos actualizados en sessionStorage
+      sessionStorage.setItem("checkout-form-data", JSON.stringify(updatedData))
+
+      return updatedData
+    })
 
     if (touched[name]) {
       const error = validateField(name as keyof FormData, value)
@@ -138,202 +150,128 @@ export default function CheckoutPage() {
     e.preventDefault()
 
     const allTouched: Record<string, boolean> = {}
-    Object.keys(formData).forEach((key) => { allTouched[key] = true })
-    allTouched["departamento"] = true
-    allTouched["ciudad"] = true
+    Object.keys(formData).forEach((field) => {
+      allTouched[field] = true
+    })
     setTouched(allTouched)
 
-    if (isFormValid()) {
-      const fullAddress = `${departamento}, ${ciudad}, ${formData.direccion}`
-      const dataToSave = { ...formData, direccion: fullAddress }
+    if (!isFormValid()) return
 
-      localStorage.setItem("antojitosquin-checkout", JSON.stringify(dataToSave))
-      router.push("/payment")
-    }
-  }
-
-  const formatPrice = (price: number) => {
-    return new Intl.NumberFormat("es-CO", {
-      style: "currency",
-      currency: "COP",
-      minimumFractionDigits: 0,
-    }).format(price)
-  }
-
-  if (items.length === 0) return null
-
-  const inputClasses = (fieldName: keyof FormData) =>
-    cn(
-      "w-full px-4 py-3 pl-12 rounded-xl border bg-background transition-all",
-      errors[fieldName] && touched[fieldName]
-        ? "border-destructive focus:ring-destructive/50"
-        : !errors[fieldName] && touched[fieldName] && formData[fieldName]
-        ? "border-accent focus:ring-accent/50"
-        : "border-border focus:ring-primary/50",
-      "focus:outline-none focus:ring-2"
-    )
-
-  const selectClasses = (field: "departamento" | "ciudad") =>
-    cn(
-      "w-full px-4 py-3 rounded-xl border bg-background transition-all focus:outline-none focus:ring-2",
-      errors[field] && touched[field] ? "border-destructive focus:ring-destructive/50" : "border-border focus:ring-primary/50"
-    )
-
-  const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
-  const formatShipping = shippingCost === 0 
-    ? <span className="font-bold text-green-600">Gratis</span> 
-    : formatPrice(shippingCost)
-  const totalWithShipping = totalPrice + shippingCost
-
-  let shippingMessage = ""
-  if (totalPrice < 50000) {
-    const diff = 50000 - totalPrice
-    shippingMessage = `¡Estás cerca! Solo ` + 
-      `<span class="font-bold text-yellow-600">${formatPrice(diff)}</span>` + 
-      ` más y tu pedido tendrá envío por solo 5.000 COP.`
-  } else if (totalPrice < 100000) {
-    const diff = 100000 - totalPrice
-    shippingMessage = `¡Casi llegas! Agrega ` + 
-      `<span class="font-bold text-yellow-600">${formatPrice(diff)}</span>` + 
-      ` más para disfrutar de envío gratis en tu pedido.`
+    // Aquí procesas el envío del formulario (por ejemplo, redirigir a la página de pago)
+    router.push("/payment")
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <>
       <StoreHeader />
-      <main className="max-w-2xl mx-auto px-4 py-8">
-        <div className="flex items-center gap-4 mb-8">
-          <Link href="/cart" className="p-2 rounded-full hover:bg-muted transition-colors">
-            <ArrowLeft className="w-5 h-5" />
-          </Link>
-          <h1 className="text-2xl font-bold text-foreground">Datos de Envío</h1>
-        </div>
+      <main className="container py-12">
+        <h1 className="text-3xl font-bold mb-8">Confirmar datos</h1>
+        <form onSubmit={handleSubmit}>
+          <div className="space-y-4">
+            <div className="flex items-center space-x-2">
+              <User size={20} />
+              <input
+                type="text"
+                name="nombre"
+                id="nombre"
+                placeholder="Nombre completo"
+                value={formData.nombre}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="input"
+              />
+            </div>
+            {errors.nombre && <p className="text-red-500">{errors.nombre}</p>}
 
-        {/* Progress Steps */}
-        <div className="flex items-center justify-center mb-8">
-          <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-bold text-sm">1</div>
-            <span className="ml-2 text-sm font-medium text-foreground">Datos</span>
+            <div className="flex items-center space-x-2">
+              <MapPin size={20} />
+              <input
+                type="text"
+                name="direccion"
+                id="direccion"
+                placeholder="Dirección"
+                value={formData.direccion}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="input"
+              />
+            </div>
+            {errors.direccion && <p className="text-red-500">{errors.direccion}</p>}
+
+            <div className="flex items-center space-x-2">
+              <Phone size={20} />
+              <input
+                type="tel"
+                name="telefono"
+                id="telefono"
+                placeholder="Teléfono"
+                value={formData.telefono}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="input"
+              />
+            </div>
+            {errors.telefono && <p className="text-red-500">{errors.telefono}</p>}
+
+            <div className="flex items-center space-x-2">
+              <Mail size={20} />
+              <input
+                type="email"
+                name="correo"
+                id="correo"
+                placeholder="Correo electrónico"
+                value={formData.correo}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                className="input"
+              />
+            </div>
+            {errors.correo && <p className="text-red-500">{errors.correo}</p>}
+
+            {/* Departamento */}
+            <div className="flex items-center space-x-2">
+              <label htmlFor="departamento" className="font-semibold">Departamento</label>
+              <select
+                id="departamento"
+                value={departamento}
+                onChange={(e) => setDepartamento(e.target.value)}
+                className="input"
+              >
+                <option value="">Selecciona un departamento</option>
+                {Object.keys(departamentos).map((dep) => (
+                  <option key={dep} value={dep}>
+                    {dep}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.departamento && <p className="text-red-500">{errors.departamento}</p>}
+
+            {/* Ciudad */}
+            <div className="flex items-center space-x-2">
+              <label htmlFor="ciudad" className="font-semibold">Ciudad</label>
+              <select
+                id="ciudad"
+                value={ciudad}
+                onChange={(e) => setCiudad(e.target.value)}
+                className="input"
+              >
+                <option value="">Selecciona una ciudad</option>
+                {departamentos[departamento]?.map((city) => (
+                  <option key={city} value={city}>
+                    {city}
+                  </option>
+                ))}
+              </select>
+            </div>
+            {errors.ciudad && <p className="text-red-500">{errors.ciudad}</p>}
+
+            <button type="submit" className="btn btn-primary w-full">
+              Continuar
+            </button>
           </div>
-          <div className="w-12 h-0.5 bg-border mx-2"></div>
-          <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm">2</div>
-            <span className="ml-2 text-sm font-medium text-muted-foreground">Pago</span>
-          </div>
-          <div className="w-12 h-0.5 bg-border mx-2"></div>
-          <div className="flex items-center">
-            <div className="w-8 h-8 rounded-full bg-muted text-muted-foreground flex items-center justify-center font-bold text-sm">3</div>
-            <span className="ml-2 text-sm font-medium text-muted-foreground">Confirmación</span>
-          </div>
-        </div>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div className="bg-card rounded-xl border border-border p-6 space-y-5">
-            {/* Nombre */}
-            <div>
-              <label htmlFor="nombre" className="block text-sm font-medium text-foreground mb-2">Nombre completo</label>
-              <div className="relative">
-                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input type="text" id="nombre" name="nombre" value={formData.nombre} onChange={handleChange} onBlur={handleBlur} placeholder="Juan Pérez" className={inputClasses("nombre")} />
-                {!errors.nombre && touched.nombre && formData.nombre && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
-              </div>
-              {errors.nombre && touched.nombre && <p className="mt-1 text-sm text-destructive">{errors.nombre}</p>}
-            </div>
-
-            {/* Departamento / Ciudad */}
-            <div className="flex flex-col gap-4">
-              <div>
-                <label htmlFor="departamento" className="block text-sm font-medium text-foreground mb-2">Departamento</label>
-                <select id="departamento" value={departamento} onChange={(e) => { setDepartamento(e.target.value); setCiudad(""); }} className={selectClasses("departamento")}>
-                  <option value="">Selecciona un departamento</option>
-                  {Object.keys(departamentos).map(dep => (<option key={dep} value={dep}>{dep}</option>))}
-                </select>
-                {errors.departamento && touched.departamento && <p className="mt-1 text-sm text-destructive">{errors.departamento}</p>}
-              </div>
-
-              <div>
-                <label htmlFor="ciudad" className="block text-sm font-medium text-foreground mb-2">Ciudad</label>
-                <select id="ciudad" value={ciudad} onChange={(e) => setCiudad(e.target.value)} disabled={!departamento} className={selectClasses("ciudad")}>
-                  <option value="">Selecciona una ciudad</option>
-                  {departamento && departamentos[departamento].map(c => (<option key={c} value={c}>{c}</option>))}
-                </select>
-                {errors.ciudad && touched.ciudad && <p className="mt-1 text-sm text-destructive">{errors.ciudad}</p>}
-              </div>
-            </div>
-
-            {/* Dirección */}
-            <div>
-              <label htmlFor="direccion" className="block text-sm font-medium text-foreground mb-2">Dirección de entrega</label>
-              <div className="relative">
-                <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input type="text" id="direccion" name="direccion" value={formData.direccion} onChange={handleChange} onBlur={handleBlur} placeholder="Calle 123 #45-67, Barrio, Ciudad" className={inputClasses("direccion")} />
-                {!errors.direccion && touched.direccion && formData.direccion && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
-              </div>
-              {errors.direccion && touched.direccion && <p className="mt-1 text-sm text-destructive">{errors.direccion}</p>}
-            </div>
-
-            {/* Teléfono */}
-            <div>
-              <label htmlFor="telefono" className="block text-sm font-medium text-foreground mb-2">Teléfono</label>
-              <div className="relative">
-                <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input type="tel" id="telefono" name="telefono" value={formData.telefono} onChange={handleChange} onBlur={handleBlur} placeholder="3001234567" className={inputClasses("telefono")} />
-                {!errors.telefono && touched.telefono && formData.telefono && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
-              </div>
-              {errors.telefono && touched.telefono && <p className="mt-1 text-sm text-destructive">{errors.telefono}</p>}
-            </div>
-
-            {/* Correo */}
-            <div>
-              <label htmlFor="correo" className="block text-sm font-medium text-foreground mb-2">Correo electrónico</label>
-              <div className="relative">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input type="email" id="correo" name="correo" value={formData.correo} onChange={handleChange} onBlur={handleBlur} placeholder="juan@email.com" className={inputClasses("correo")} />
-                {!errors.correo && touched.correo && formData.correo && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
-              </div>
-              {errors.correo && touched.correo && <p className="mt-1 text-sm text-destructive">{errors.correo}</p>}
-            </div>
-          </div>
-
-          {/* Shipping & Total */}
-          <div className="bg-card rounded-xl border border-border p-6 space-y-4">
-            {shippingMessage && (
-              <p className="text-sm text-yellow-600" dangerouslySetInnerHTML={{ __html: shippingMessage }}></p>
-            )}
-            <div className="flex justify-between text-sm">
-              <span>Subtotal:</span>
-              <span>{formatPrice(totalPrice)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>Envío:</span>
-              <span>{formatShipping}</span>
-            </div>
-            <div className="flex justify-between font-bold text-lg">
-              <span>Total:</span>
-              <span>{formatPrice(totalWithShipping)}</span>
-            </div>
-          </div>
-
-          {/* Política de datos */}
-          <div className="flex items-center gap-2">
-            <input type="checkbox" id="policy" checked={policyAccepted} onChange={() => setPolicyAccepted(!policyAccepted)} />
-            <label htmlFor="policy" className="text-sm text-foreground">Acepto la <button type="button" onClick={() => setShowPolicyModal(true)} className="text-primary underline">política de datos</button></label>
-          </div>
-
-          <button type="submit" disabled={!policyAccepted} className="w-full py-3 px-6 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed">Continuar</button>
         </form>
-
-        {/* Modal */}
-        {showPolicyModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-xl max-w-lg w-full">
-              <h2 className="text-xl font-bold mb-4">Política de Datos</h2>
-              <p className="mb-4">Aquí va la política de tratamiento de datos.</p>
-              <button onClick={() => setShowPolicyModal(false)} className="px-4 py-2 bg-primary text-white rounded-lg">Cerrar</button>
-            </div>
-          </div>
-        )}
       </main>
-    </div>
+    </>
   )
 }
