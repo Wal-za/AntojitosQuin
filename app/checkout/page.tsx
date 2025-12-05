@@ -298,7 +298,7 @@ export default function CheckoutPage() {
           {/* Shipping & Total */}
           <div className="bg-card rounded-xl border border-border p-6 space-y-4">
             {shippingMessage && (
-              <p className="text-sm text-yellow-600" dangerouslySetInnerHTML={{ __html: shippingMessage }}></p>
+              <p className="text-sm text-green-800" dangerouslySetInnerHTML={{ __html: shippingMessage }}></p>
             )}
             <div className="flex justify-between text-sm">
               <span>Subtotal:</span>

@@ -2,6 +2,13 @@ import nodemailer from "nodemailer";
 
 export async function sendOrderEmail(order: any) {
   try {
+    // Función para calcular el costo de envío
+    const calculateShippingCost = (total: number) => {
+      if (total > 100000) return 0; // Envío gratis si el total es mayor a 100 mil
+      if (total > 50000) return 5000; // Envío vale 5 mil si el total es mayor a 50 mil
+      return 10000; // Envío vale 10 mil si el total es menor a 50 mil
+    };
+
     // Configuración del transportador SMTP
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -15,6 +22,9 @@ export async function sendOrderEmail(order: any) {
         rejectUnauthorized: false,
       },
     });
+
+    // Calcular el costo de envío
+    const shippingCost = calculateShippingCost(order.total);
 
     // HTML del correo usando la URL pública directamente
     const mailHtml = `
@@ -57,9 +67,10 @@ export async function sendOrderEmail(order: any) {
           <!-- Envío -->
           <div style="display: flex; justify-content: space-between; font-weight: bold; margin-top: 15px;">
             <span>Envío:</span>
-            <span>${order.shipping === 0 ? "Gratis" : `$${order.shipping.toLocaleString()}`}</span>
+            <span>${shippingCost === 0 ? "Gratis" : `$${shippingCost.toLocaleString()}`}</span>
           </div>
 
+          <!-- Total (sin agregar el costo del envío, ya está incluido en order.total) -->
           <h3 style="text-align: right; margin-top: 20px;">Total: $${order.total.toLocaleString()}</h3>
         </div>
 

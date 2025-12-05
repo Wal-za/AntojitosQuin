@@ -9,7 +9,7 @@ export default function ConfirmationPage() {
   const [order, setOrder] = useState<any>(null)
   const [showConfetti, setShowConfetti] = useState(true)
   const [sparkles, setSparkles] = useState<
-    { left: string; top: string; animationDelay: string; animationDuration: string }[]
+    { left: string; top: string; animationDelay: string; animationDuration: string }[] 
   >([])
 
   useEffect(() => {
@@ -46,6 +46,13 @@ export default function ConfirmationPage() {
       currency: "COP",
       minimumFractionDigits: 0,
     }).format(price)
+
+  // Calcular el costo de envío (misma lógica que antes)
+  const calculateShippingCost = (total: number) => {
+    if (total > 100000) return 0; // Envío gratis si el total es mayor a 100 mil
+    if (total > 50000) return 5000; // Envío vale 5 mil si el total es mayor a 50 mil
+    return 10000; // Envío vale 10 mil si el total es menor a 50 mil
+  }
 
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
@@ -111,8 +118,10 @@ export default function ConfirmationPage() {
             {/* Envío */}
             <div className="flex justify-between text-sm mb-2">
               <span className="text-foreground font-semibold">Envío</span>
-              <span className={cn("font-semibold", order.shipping === 0 ? "text-green-600" : "text-foreground")}>
-                {order.shipping === 0 ? "Gratis" : formatPrice(order.shipping)}
+              <span className={cn("font-semibold", calculateShippingCost(order.total) === 0 ? "text-green-600" : "text-foreground")}>
+                {calculateShippingCost(order.total) === 0
+                  ? "Gratis"
+                  : formatPrice(calculateShippingCost(order.total))}
               </span>
             </div>
 
@@ -120,7 +129,7 @@ export default function ConfirmationPage() {
 
             <div className="flex justify-between font-bold text-lg">
               <span className="text-foreground">Total pagado</span>
-              <span className="text-primary">{formatPrice(order.total)}</span>
+              <span className="text-primary">{formatPrice(order.total)}</span> {/* Ya incluye el envío */}
             </div>
 
             <hr className="border-border my-4" />
