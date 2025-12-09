@@ -7,6 +7,8 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, User, MapPin, Phone, Mail, Check } from "lucide-react"
 import { StoreHeader } from "@/components/store-header"
 import { useCart } from "@/context/cart-context"
+import { getShippingCost, getShippingMessage } from "../../context/shipping";
+
 import { cn } from "@/lib/utils"
 
 interface FormData {
@@ -179,24 +181,14 @@ export default function CheckoutPage() {
       errors[field] && touched[field] ? "border-destructive focus:ring-destructive/50" : "border-border focus:ring-primary/50"
     )
 
-  const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
+  const shippingCost = getShippingCost(totalPrice)
   const formatShipping = shippingCost === 0 
     ? <span className="font-bold text-green-600">Gratis</span> 
     : formatPrice(shippingCost)
   const totalWithShipping = totalPrice + shippingCost
 
-  let shippingMessage = ""
-  if (totalPrice < 50000) {
-    const diff = 50000 - totalPrice
-    shippingMessage = `¡Estás cerca! Solo ` + 
-      `<span class="font-bold text-green-800">${formatPrice(diff)}</span>` + 
-      ` más y tu pedido tendrá envío por solo $5.000.`
-  } else if (totalPrice < 100000) {
-    const diff = 100000 - totalPrice
-    shippingMessage = `¡Casi llegas! Agrega ` + 
-      `<span class="font-bold text-green-800">${formatPrice(diff)}</span>` + 
-      ` más para disfrutar de envío gratis en tu pedido.`
-  }
+  let shippingMessage = getShippingMessage(totalPrice)
+  
 
   return (
     <div className="min-h-screen bg-background">

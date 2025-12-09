@@ -31,16 +31,19 @@ export async function POST(request: Request) {
     const body = await request.json()
 
     // Si precioFinal no viene, usar precioOriginal
-    const precioFinal = body.precioFinal ?? body.precioOriginal
+    const precioFinal = (!body.precioFinal || body.precioFinal === body.precioOriginal)
+  ? body.precioOriginal
+  : body.precioFinal;
+
 
     const product = await createProduct({
       nombre: body.nombre,
       categoria: body.categoria,
-      precioCompra: body.precioCompra ?? 0, 
+      precioCompra: body.precioCompra ?? 0,
       precioOriginal: (body.precioOriginal === 0 || body.precioOriginal == null) ? body.precioFinal : body.precioOriginal,
       precioFinal: precioFinal,
       descripcion: body.descripcion,
-      imagen: body.imagen,
+      imagenes: Array.isArray(body.imagenes) && body.imagenes.length > 0 ? body.imagenes : [],
       etiqueta: body.etiqueta || null,
       stock: body.stock || 0,
     })

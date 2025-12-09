@@ -15,7 +15,7 @@ interface ProductFormData {
   precioOriginal: number | null
   precioFinal: number | null
   descripcion: string
-  imagen: string
+  imagenes: string[]
   etiqueta: string
   stock: number | null
 }
@@ -27,7 +27,7 @@ const emptyForm: ProductFormData = {
   precioOriginal: 0,
   precioFinal: 0,
   descripcion: "",
-  imagen: "",
+  imagenes: [""],
   etiqueta: "",
   stock: null,
 }
@@ -88,7 +88,7 @@ export default function AdminProductsPage() {
         precioOriginal: product.precioOriginal,
         precioFinal: product.precioOriginal === product.precioFinal ? 0 : product.precioFinal,
         descripcion: product.descripcion,
-        imagen: product.imagen,
+        imagenes: product.imagenes && product.imagenes.length > 0 ? product.imagenes : [""],
         etiqueta: product.etiqueta || "",
         stock: product.stock,
       })
@@ -98,6 +98,8 @@ export default function AdminProductsPage() {
     }
     setIsModalOpen(true)
   }
+
+
 
   const closeModal = () => {
     setIsModalOpen(false)
@@ -245,7 +247,7 @@ export default function AdminProductsPage() {
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
                                 <Image
-                                  src={product.imagen || "/placeholder.svg"}
+                                  src={product.imagenes[0] || "/placeholder.svg"}
                                   alt={product.nombre}
                                   width={48}
                                   height={48}
@@ -371,7 +373,7 @@ export default function AdminProductsPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                         <Image
-                          src={product.imagen || "/placeholder.svg"}
+                          src={product.imagenes[0] || "/placeholder.svg"}
                           alt={product.nombre}
                           width={64}
                           height={64}
@@ -470,7 +472,10 @@ export default function AdminProductsPage() {
                 <h2 className="text-lg font-bold text-foreground">
                   {editingProduct ? "Editar Producto" : "Nuevo Producto"}
                 </h2>
-                <button onClick={closeModal} className="p-2 rounded-lg hover:bg-muted transition-colors">
+                <button
+                  onClick={closeModal}
+                  className="p-2 rounded-lg hover:bg-muted transition-colors"
+                >
                   <X className="w-5 h-5" />
                 </button>
               </div>
@@ -524,17 +529,46 @@ export default function AdminProductsPage() {
                   </div>
                 </div>
 
-                {/* IMAGEN */}
+                {/* IMÁGENES */}
                 <div className="bg-muted/40 p-4 rounded-xl border border-border space-y-2">
-                  <label className="text-sm font-medium">URL de Imagen *</label>
-                  <input
-                    type="url"
-                    name="imagen"
-                    value={formData.imagen}
-                    onChange={handleChange}
-                    className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
-                    required
-                  />
+                  <h3 className="font-semibold text-lg">Imágenes</h3>
+
+                  {formData.imagenes.map((img, index) => (
+                    <div key={index} className="flex gap-2 items-center">
+                      <input
+                        type="url"
+                        placeholder="URL de la imagen"
+                        value={img}
+                        onChange={(e) => {
+                          const newImgs = [...formData.imagenes];
+                          newImgs[index] = e.target.value;
+                          setFormData((prev) => ({ ...prev, imagenes: newImgs }));
+                        }}
+                        className="flex-1 px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
+                        required
+                      />
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const newImgs = formData.imagenes.filter((_, i) => i !== index);
+                          setFormData((prev) => ({ ...prev, imagenes: newImgs.length ? newImgs : [""] }));
+                        }}
+                        className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                      >
+                        Eliminar
+                      </button>
+                    </div>
+                  ))}
+
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setFormData((prev) => ({ ...prev, imagenes: [...prev.imagenes, ""] }))
+                    }
+                    className="mt-2 px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary/90 transition"
+                  >
+                    Agregar Imagen
+                  </button>
                 </div>
 
                 {/* PRECIOS */}
@@ -550,7 +584,7 @@ export default function AdminProductsPage() {
                       value={formData.precioCompra === 0 || formData.precioCompra === null ? "" : formData.precioCompra}
                       onChange={(e) => {
                         const value = e.target.value;
-                        setFormData(prev => ({
+                        setFormData((prev) => ({
                           ...prev,
                           precioCompra: value === "" ? null : Number(value),
                         }));
@@ -569,7 +603,7 @@ export default function AdminProductsPage() {
                       value={formData.precioOriginal === 0 || formData.precioOriginal === null ? "" : formData.precioOriginal}
                       onChange={(e) => {
                         const value = e.target.value;
-                        setFormData(prev => ({
+                        setFormData((prev) => ({
                           ...prev,
                           precioOriginal: value === "" ? null : Number(value),
                         }));
@@ -588,17 +622,16 @@ export default function AdminProductsPage() {
                       value={formData.precioFinal === 0 || formData.precioFinal === null ? "" : formData.precioFinal}
                       onChange={(e) => {
                         const value = e.target.value;
-                        setFormData(prev => ({
+                        setFormData((prev) => ({
                           ...prev,
                           precioFinal: value === "" ? null : Number(value),
                         }));
                       }}
                       className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
-                      
                     />
                   </div>
 
-                  {/* DESCUENTO SIEMPRE VISIBLE */}
+                  {/* DESCUENTO */}
                   <div className="p-3 bg-green-100 text-green-800 rounded-lg text-sm border border-green-300">
                     Descuento aplicado: <strong>{Math.max(calculateDiscount(), 0)}%</strong>
                   </div>
@@ -606,21 +639,25 @@ export default function AdminProductsPage() {
                   {/* GANANCIA */}
                   {formData.precioCompra !== null &&
                     formData.precioCompra > 0 &&
-                    (formData.precioOriginal !== null && formData.precioOriginal > 0 || formData.precioFinal !== null && formData.precioFinal > 0) && (
+                    ((formData.precioOriginal !== null && formData.precioOriginal > 0) || (formData.precioFinal !== null && formData.precioFinal > 0)) && (
                       (() => {
-                        const precioFinal = formData.precioFinal ?? formData.precioOriginal ?? 0; // usa 0 si ambos son null
+                        let precioFinal = 0;
+
+                        if (formData.precioFinal === formData.precioOriginal || formData.precioFinal === 0 || formData.precioFinal === null) {
+                          precioFinal = formData.precioOriginal
+                        } else {
+                          precioFinal = formData.precioFinal!
+                        }
+
                         const ganancia = precioFinal - formData.precioCompra!;
                         const esPositiva = ganancia >= 0;
                         return (
-                          <div className={`p-3 rounded-lg text-sm border ${esPositiva ? "bg-green-50 text-green-700 border-green-300" : "bg-red-50 text-red-700 border-red-300"
-                            }`}>
+                          <div className={`p-3 rounded-lg text-sm border ${esPositiva ? "bg-green-50 text-green-700 border-green-300" : "bg-red-50 text-red-700 border-red-300"}`}>
                             Ganancia estimada: <strong>${ganancia.toLocaleString()}</strong>
                           </div>
-                        )
+                        );
                       })()
                     )}
-
-
                 </div>
 
                 {/* INVENTARIO */}
@@ -680,11 +717,10 @@ export default function AdminProductsPage() {
                   </button>
                 </div>
               </form>
-
-
             </div>
           </div>
         )}
+
       </div>
     </AdminLayout>
   )

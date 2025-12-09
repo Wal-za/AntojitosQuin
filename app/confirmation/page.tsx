@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import Link from "next/link"
 import { CheckCircle, Package, Mail, Home, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { getShippingCost } from "../../context/shipping";
 
 export default function ConfirmationPage() {
   const [order, setOrder] = useState<any>(null)
@@ -46,14 +47,7 @@ export default function ConfirmationPage() {
       currency: "COP",
       minimumFractionDigits: 0,
     }).format(price)
-
-  // Calcular el costo de envío (misma lógica que antes)
-  const calculateShippingCost = (total: number) => {
-    if (total > 100000) return 0; // Envío gratis si el total es mayor a 100 mil
-    if (total > 50000) return 5000; // Envío vale 5 mil si el total es mayor a 50 mil
-    return 10000; // Envío vale 10 mil si el total es menor a 50 mil
-  }
-
+  
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
       {/* Confetti */}
@@ -118,10 +112,10 @@ export default function ConfirmationPage() {
             {/* Envío */}
             <div className="flex justify-between text-sm mb-2">
               <span className="text-foreground font-semibold">Envío</span>
-              <span className={cn("font-semibold", calculateShippingCost(order.total) === 0 ? "text-green-600" : "text-foreground")}>
-                {calculateShippingCost(order.total) === 0
+              <span className={cn("font-semibold", getShippingCost(order.total) === 0 ? "text-green-600" : "text-foreground")}>
+                {getShippingCost(order.total) === 0
                   ? "Gratis"
-                  : formatPrice(calculateShippingCost(order.total))}
+                  : formatPrice(getShippingCost(order.total))}
               </span>
             </div>
 

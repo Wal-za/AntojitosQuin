@@ -3,15 +3,17 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, CreditCard, Smartphone, Building2, Loader2 } from "lucide-react"
+import { ArrowLeft, Smartphone, Building2 } from "lucide-react"
 import { StoreHeader } from "@/components/store-header"
 import { useCart } from "@/context/cart-context"
+import { getShippingCost, getShippingMessage } from "../../context/shipping";
 import { cn } from "@/lib/utils"
 
+// --- Métodos de pago actualizados ---
 const paymentMethods = [
-  { id: "card", name: "Tarjeta de Crédito/Débito", icon: CreditCard },
-  { id: "nequi", name: "Nequi", icon: Smartphone },
-  { id: "pse", name: "PSE", icon: Building2 },
+  { id: "cash", name: "Contra entrega (Efectivo)", icon: Smartphone },
+  { id: "nequi", name: "Transferencia a Nequi", icon: Smartphone },
+  { id: "bancolombia", name: "Transferencia Bancolombia", icon: Building2 },
 ]
 
 export default function PaymentPage() {
@@ -39,22 +41,17 @@ export default function PaymentPage() {
     new Intl.NumberFormat("es-CO", { style: "currency", currency: "COP", minimumFractionDigits: 0 }).format(price)
 
   // --- Envío dinámico ---
-  const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
+  const shippingCost = getShippingCost(totalPrice)
   const totalWithShipping = totalPrice + shippingCost
   const formatShipping = shippingCost === 0 ? "Gratis" : formatPrice(shippingCost)
-
-  let shippingMessage = ""
-  if (totalPrice < 50000) {
-    shippingMessage = `¡Estás cerca! Solo ${formatPrice(50000 - totalPrice)} más y tu pedido tendrá envío por solo 5.000 COP.`
-  } else if (totalPrice < 100000) {
-    shippingMessage = `¡Casi llegas! Agrega ${formatPrice(100000 - totalPrice)} más para disfrutar de envío gratis en tu pedido.`
-  }
+  let shippingMessage = getShippingMessage(totalPrice)
 
   const handlePayment = async () => {
     if (!selectedMethod || !checkoutData) return
 
     setIsProcessing(true)
 
+    // Simular procesamiento
     await new Promise((resolve) => setTimeout(resolve, 2000))
 
     const orderNumber = `ORD-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`
@@ -192,10 +189,10 @@ export default function PaymentPage() {
           {isProcessing ? (
             <>
               <Loader2 className="w-5 h-5 animate-spin" />
-              Procesando pago...
+              Procesando...
             </>
           ) : (
-            "Confirmar Pago"
+            "Confirmar Pedido"
           )}
         </button>
       </main>

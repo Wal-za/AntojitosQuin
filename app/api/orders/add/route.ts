@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import clientPromise from "@/lib/mongodb"
+import { getShippingCost } from "../../../../context/shipping";
+
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,12 +14,7 @@ export async function POST(req: NextRequest) {
     const orders = db.collection("orders")
 
     // Calcular costo de envío según la lógica de checkout
-    const shippingCost =
-      order.totalPrice < 50000
-        ? 10000
-        : order.totalPrice < 100000
-        ? 5000
-        : 0
+    const shippingCost = getShippingCost(order.totalPrice);
 
     // Preparar el nuevo pedido con shipping y total final
     const newOrder = {

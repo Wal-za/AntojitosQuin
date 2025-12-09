@@ -18,9 +18,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const { getProductById, getProductsByCategory } = useProducts()
   const { addToCart } = useCart()
   const router = useRouter()
+
   const [quantity, setQuantity] = useState(1)
   const [isAdding, setIsAdding] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [selectedImage, setSelectedImage] = useState<string | null>(null)
 
   useEffect(() => {
     setMounted(true)
@@ -54,7 +56,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     )
   }
 
-  const discount = Math.round(((product.precioOriginal - product.precioFinal) / product.precioOriginal) * 100)
+  // Aseguramos que product.imagenes sea un array
+  const images = product.imagenes && product.imagenes.length > 0 ? product.imagenes : [product.imagen]
+
+  const discount = product.precioOriginal
+    ? Math.round(((product.precioOriginal - product.precioFinal) / product.precioOriginal) * 100)
+    : 0
 
   const similarProducts = getProductsByCategory(product.categoria)
     .filter((p) => p.id !== product.id)
@@ -77,7 +84,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         precioCompra: product.precioCompra,
         precioFinal: product.precioFinal,
         precioOriginal: product.precioOriginal,
-        imagen: product.imagen,
+        imagen: images[0], // siempre usamos la primera imagen
       })
     }
     setTimeout(() => setIsAdding(false), 300)
@@ -101,25 +108,50 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       {/* Product Detail */}
       <main className="max-w-7xl mx-auto px-4 pb-12">
         <div className="grid md:grid-cols-2 gap-8 animate-slide-up">
-          {/* Image */}
-          <div className="relative aspect-square rounded-2xl overflow-hidden bg-card shadow-md">
-            <Image
-              src={product.imagen || "/placeholder.svg"}
-              alt={product.nombre}
-              fill
-              className="object-cover"
-              priority
-            />
-            {discount > 0 && (
-              <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground px-3 py-1.5 rounded-lg text-sm font-bold">
-                -{discount}% OFF
-              </div>
-            )}
-            {product.etiqueta && (
-              <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm font-semibold">
-                {product.etiqueta}
-              </div>
-            )}
+
+          {/* Image Gallery */}
+          <div className="flex flex-col gap-4">
+            {/* Imagen principal */}
+            <div className="relative aspect-square rounded-2xl overflow-hidden bg-card shadow-md">
+              <Image
+                src={selectedImage || images[0] || "/placeholder.svg"}
+                alt={product.nombre}
+                fill
+                className="object-cover"
+                priority
+              />
+              {discount > 0 && (
+                <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground px-3 py-1.5 rounded-lg text-sm font-bold">
+                  -{discount}% OFF
+                </div>
+              )}
+              {product.etiqueta && (
+                <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm font-semibold">
+                  {product.etiqueta}
+                </div>
+              )}
+            </div>
+
+            {/* Miniaturas */}
+            <div className="flex gap-2 overflow-x-auto">
+              {images.map((img, index) => (
+                <button
+                  key={index}
+                  onClick={() => setSelectedImage(img)}
+                  className={cn(
+                    "relative w-13 h-13 rounded-lg overflow-hidden border-2 flex-shrink-0",
+                    selectedImage === img ? "border-primary" : "border-border"
+                  )}
+                >
+                  <Image
+                    src={img}
+                    alt={`${product.nombre} ${index + 1}`}
+                    fill
+                    className="object-cover"
+                  />
+                </button>
+              ))}
+            </div>
           </div>
 
           {/* Info */}

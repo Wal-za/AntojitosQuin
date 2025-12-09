@@ -1,13 +1,8 @@
 import nodemailer from "nodemailer";
+import { getShippingCost } from "../context/shipping";
 
 export async function sendOrderEmail(order: any) {
-  try {
-    // Función para calcular el costo de envío
-    const calculateShippingCost = (total: number) => {
-      if (total > 100000) return 0; // Envío gratis si el total es mayor a 100 mil
-      if (total > 50000) return 5000; // Envío vale 5 mil si el total es mayor a 50 mil
-      return 10000; // Envío vale 10 mil si el total es menor a 50 mil
-    };
+  try {   
 
     // Configuración del transportador SMTP
     const transporter = nodemailer.createTransport({
@@ -24,7 +19,7 @@ export async function sendOrderEmail(order: any) {
     });
 
     // Calcular el costo de envío
-    const shippingCost = calculateShippingCost(order.total);
+    const shippingCost = getShippingCost(order.total);
 
     // HTML del correo usando la URL pública directamente
     const mailHtml = `
@@ -41,7 +36,7 @@ export async function sendOrderEmail(order: any) {
           <h2>Hola ${order.cliente.nombre},</h2>
           <p>¡Estamos muy contentos de que hayas comprado con nosotros! Aquí tienes los detalles de tu pedido:</p>
           <p><b>Número de orden:</b><br/>${order.orderNumber}</p>
-          <p><b>Fecha:</b> ${new Date(order.createdAt).toLocaleString()}<br/>
+          <p><b>Fecha:</b> ${new Date(order.createdAt).toLocaleString("es-CO", { timeZone: "America/Bogota" })}<br/>
           <b>Estado:</b> ${order.estado}<br/>
           <b>Método de pago:</b> ${order.metodoPago}</p>
         </div>

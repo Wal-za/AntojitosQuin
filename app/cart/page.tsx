@@ -5,6 +5,7 @@ import Link from "next/link"
 import { ArrowLeft, Trash2, Minus, Plus, ShoppingBag } from "lucide-react"
 import { StoreHeader } from "@/components/store-header"
 import { useCart } from "@/context/cart-context"
+import { getShippingCost, getShippingMessage } from "../../context/shipping";
 import { cn } from "@/lib/utils"
 
 export default function CartPage() {
@@ -19,19 +20,12 @@ export default function CartPage() {
   }
 
   // Lógica de envío según valor del carrito
-  const shippingCost = totalPrice < 50000 ? 10000 : totalPrice < 100000 ? 5000 : 0
+  const shippingCost = getShippingCost(totalPrice);
   const formatShipping = shippingCost === 0 ? "Gratis" : formatPrice(shippingCost)
   const totalWithShipping = totalPrice + shippingCost
 
   // Mensaje dinámico de incentivo más motivador
-  let shippingMessage = ""
-  if (totalPrice < 50000) {
-    const diff = 50000 - totalPrice
-    shippingMessage = `¡Estás cerca! Solo ${formatPrice(diff)} más y tu pedido tendrá envío por solo 5.000 COP.`
-  } else if (totalPrice < 100000) {
-    const diff = 100000 - totalPrice
-    shippingMessage = `¡Casi llegas! Agrega ${formatPrice(diff)} más para disfrutar de envío gratis en tu pedido.`
-  }
+  let shippingMessage = getShippingMessage(totalPrice)  
 
   return (
     <div className="min-h-screen bg-background">

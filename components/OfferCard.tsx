@@ -30,7 +30,7 @@ export function OfferCard({ product }: OfferCardProps) {
             precioCompra: product.precioCompra,
             precioFinal: product.precioFinal,
             precioOriginal: product.precioOriginal,
-            imagen: product.imagen,
+            imagen: product.imagenes[0] || null,
         })
         setTimeout(() => setIsAdding(false), 300)
     }
@@ -60,7 +60,7 @@ export function OfferCard({ product }: OfferCardProps) {
                 {/* Imagen */}
                 <div className="relative aspect-square overflow-hidden bg-muted">
                     <Image
-                        src={product.imagen || "/placeholder.svg"}
+                        src={product.imagenes[0] || "/placeholder.svg"}
                         alt={product.nombre}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-300"
