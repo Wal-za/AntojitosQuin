@@ -283,13 +283,14 @@ export default function AdminProductsPage() {
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
-                                <Image
-                                  src={product.imagenes[0] || "/placeholder.svg"}
-                                  alt={product.nombre}
-                                  width={48}
-                                  height={48}
-                                  className="w-full h-full object-cover"
-                                />
+                               <Image
+  src={(product.imagenes[0]?.trim() || "/placeholder.svg")}
+  alt={product.nombre}
+  width={48}
+  height={48}
+  className="w-full h-full object-cover"
+/>
+
                               </div>
                               <div className="min-w-0">
                                 <p className="font-medium text-foreground truncate max-w-[200px]">{product.nombre}</p>
@@ -410,7 +411,7 @@ export default function AdminProductsPage() {
                     <div className="flex items-center gap-3">
                       <div className="w-16 h-16 rounded-lg overflow-hidden bg-muted flex-shrink-0">
                         <Image
-                          src={product.imagenes[0] || "/placeholder.svg"}
+                          src={(product.imagenes[0]?.trimEnd() || "/placeholder.svg")}
                           alt={product.nombre}
                           width={64}
                           height={64}

@@ -162,7 +162,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           {/* Info */}
           <div className="flex flex-col">
             <span className="text-sm text-primary font-medium mb-2">{product.categoria}</span>
-            <h1 className="text-3xl font-bold text-foreground mb-4">{product.nombre}</h1>
+            <h1 className="text-3xl font-bold text-foreground mb-4">
+              {product.nombre.charAt(0).toUpperCase() + product.nombre.slice(1).toLowerCase()}
+            </h1>
 
             {/* Pricing */}
             <div className="flex items-end gap-3 mb-4">
