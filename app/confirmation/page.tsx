@@ -19,9 +19,13 @@ export default function ConfirmationPage() {
     if (!number) return
 
     async function loadOrder() {
-      const res = await fetch(`/api/orders/by-number?orderNumber=${number}`)
-      const data = await res.json()
-      if (data.success) setOrder(data.order)
+      try {
+        const res = await fetch(`/api/orders/by-number?orderNumber=${number}`)
+        const data = await res.json()
+        if (data.success) setOrder(data.order)
+      } catch (error) {
+        console.error("Error cargando el pedido:", error)
+      }
     }
 
     loadOrder()
@@ -50,7 +54,7 @@ export default function ConfirmationPage() {
   
   return (
     <div className="min-h-screen bg-background relative overflow-hidden">
-      {/* Confetti */}
+      {/* Confetti / Sparkles */}
       {showConfetti && sparkles.length > 0 && (
         <div className="absolute inset-0 pointer-events-none">
           {sparkles.map((s, i) => (
@@ -69,7 +73,7 @@ export default function ConfirmationPage() {
       )}
 
       <main className="max-w-2xl mx-auto px-4 py-12 relative z-50">
-        {/* Icono */}
+        {/* Icono de confirmación */}
         <div className="flex justify-center mb-6">
           <div className="w-24 h-24 rounded-full bg-accent/20 flex items-center justify-center animate-bounce-small">
             <CheckCircle className="w-16 h-16 text-accent" />
@@ -83,8 +87,10 @@ export default function ConfirmationPage() {
           Gracias por tu compra. Tu pedido está siendo procesado.
         </p>
 
+        {/* Detalles del pedido */}
         {order && (
           <div className="bg-card rounded-xl border border-border p-6 mb-8 animate-slide-up bg-white">
+            {/* Número de pedido */}
             <div className="flex items-center gap-3 mb-4 bg-white">
               <Package className="w-6 h-6 text-primary" />
               <div>
@@ -95,10 +101,14 @@ export default function ConfirmationPage() {
 
             <hr className="border-border my-4" />
 
+            {/* Productos */}
             <h3 className="font-semibold text-foreground mb-3">Productos</h3>
             <div className="space-y-2 mb-4">
               {order.productos.map((item: any) => (
-                <div key={item.id} className="flex justify-between text-sm">
+                <div
+                  key={`${item.id}-${item.variante ?? 'default'}`} // 🔹 Clave única con variante
+                  className="flex justify-between text-sm"
+                >
                   <span className="text-muted-foreground">
                     {item.nombre}{item.variante ? ` ${item.variante}` : ""} x{item.cantidad}
                   </span>
@@ -121,13 +131,15 @@ export default function ConfirmationPage() {
 
             <hr className="border-border my-4" />
 
+            {/* Total pagado */}
             <div className="flex justify-between font-bold text-lg">
               <span className="text-foreground">Total pagado</span>
-              <span className="text-primary">{formatPrice(order.total)}</span> {/* Ya incluye el envío */}
+              <span className="text-primary">{formatPrice(order.total)}</span>
             </div>
 
             <hr className="border-border my-4" />
 
+            {/* Correo de confirmación */}
             <div className="flex items-center gap-3 text-sm text-muted-foreground">
               <Mail className="w-5 h-5" />
               <span>
@@ -138,6 +150,7 @@ export default function ConfirmationPage() {
           </div>
         )}
 
+        {/* Botón de volver al inicio */}
         <div className="flex flex-col sm:flex-row gap-4">
           <Link
             href="/"

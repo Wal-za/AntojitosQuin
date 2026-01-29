@@ -161,6 +161,7 @@ export default function CheckoutPage() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
 
+    // Marcar todos los campos como tocados
     const allTouched: Record<string, boolean> = {}
     Object.keys(formData).forEach((key) => { allTouched[key] = true })
     allTouched["departamento"] = true
@@ -168,19 +169,24 @@ export default function CheckoutPage() {
     setTouched(allTouched)
 
     if (isFormValid()) {
-      const fullAddress = `${departamento}, ${ciudad}, ${formData.direccion}`
-      const dataToSave = { ...formData, direccion: fullAddress, departamento, ciudad }
+      // Guardamos datos limpios, sin concatenar
+      const dataToSave = { ...formData, departamento, ciudad }
 
       localStorage.setItem("antojitosquin-checkout", JSON.stringify(dataToSave))
 
       // Guardar en cookie si el usuario marcó "recordar"
       if (rememberInfo) {
-        document.cookie = `checkoutData=${encodeURIComponent(JSON.stringify(dataToSave))}; path=/; max-age=${60*60*24*30}` // 30 días
+        document.cookie = `checkoutData=${encodeURIComponent(JSON.stringify(dataToSave))}; path=/; max-age=${60 * 60 * 24 * 30}` // 30 días
       }
+
+      // Aquí sí puedes crear la dirección completa para el backend o la página de pago
+      const fullAddress = `${departamento}, ${ciudad}, ${formData.direccion}`
 
       router.push("/payment")
     }
   }
+
+
 
   const formatPrice = (price: number) => {
     return new Intl.NumberFormat("es-CO", {
@@ -198,8 +204,8 @@ export default function CheckoutPage() {
       errors[fieldName] && touched[fieldName]
         ? "border-destructive focus:ring-destructive/50"
         : !errors[fieldName] && touched[fieldName] && formData[fieldName]
-        ? "border-accent focus:ring-accent/50"
-        : "border-border focus:ring-primary/50",
+          ? "border-accent focus:ring-accent/50"
+          : "border-border focus:ring-primary/50",
       "focus:outline-none focus:ring-2"
     )
 
@@ -210,13 +216,13 @@ export default function CheckoutPage() {
     )
 
   const shippingCost = getShippingCost(totalPrice)
-  const formatShipping = shippingCost === 0 
-    ? <span className="font-bold text-green-600">Gratis</span> 
+  const formatShipping = shippingCost === 0
+    ? <span className="font-bold text-green-600">Gratis</span>
     : formatPrice(shippingCost)
   const totalWithShipping = totalPrice + shippingCost
 
   let shippingMessage = getShippingMessage(totalPrice)
-  
+
 
   return (
     <div className="min-h-screen bg-background">
@@ -316,13 +322,13 @@ export default function CheckoutPage() {
 
             {/* Checkbox recordar info */}
             <div className="flex items-center">
-              <input type="checkbox" id="recordar" checked={rememberInfo} onChange={(e) => setRememberInfo(e.target.checked)} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"/>
+              <input type="checkbox" id="recordar" checked={rememberInfo} onChange={(e) => setRememberInfo(e.target.checked)} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
               <label htmlFor="recordar" className="ml-2 block text-sm text-foreground">Recordarme</label>
             </div>
 
             {/* Checkbox política */}
             <div className="flex items-center">
-              <input type="checkbox" id="policy" checked={policyAccepted} onChange={() => setPolicyAccepted(!policyAccepted)} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"/>
+              <input type="checkbox" id="policy" checked={policyAccepted} onChange={() => setPolicyAccepted(!policyAccepted)} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded" />
               <label htmlFor="policy" className="ml-2 block text-sm text-foreground">
                 He leído y acepto la <button type="button" onClick={() => setShowPolicyModal(true)} className="underline text-primary">política de privacidad</button>
               </label>

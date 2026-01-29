@@ -179,7 +179,13 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               )}
             </div>
 
-            <p className="text-muted-foreground leading-relaxed mb-6">{product.descripcion}</p>
+            {/* DESCRIPCION */}
+
+            <p
+              className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-wrap"
+            >
+              {product.descripcion}
+            </p>
 
             {/* Stock */}
             <div className="mb-6">
