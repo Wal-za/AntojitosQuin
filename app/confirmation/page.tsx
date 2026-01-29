@@ -100,7 +100,7 @@ export default function ConfirmationPage() {
               {order.productos.map((item: any) => (
                 <div key={item.id} className="flex justify-between text-sm">
                   <span className="text-muted-foreground">
-                    {item.nombre} x{item.cantidad}
+                    {item.nombre}{item.variante ? ` ${item.variante}` : ""} x{item.cantidad}
                   </span>
                   <span className="text-foreground">{formatPrice(item.precioFinal * item.cantidad)}</span>
                 </div>

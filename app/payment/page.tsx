@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Smartphone, Building2 } from "lucide-react"
+import { ArrowLeft, Smartphone, Building2, Loader2 } from "lucide-react"
 import { StoreHeader } from "@/components/store-header"
 import { useCart } from "@/context/cart-context"
 import { getShippingCost, getShippingMessage } from "../../context/shipping";

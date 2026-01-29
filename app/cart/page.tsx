@@ -19,13 +19,10 @@ export default function CartPage() {
     }).format(price)
   }
 
-  // Lógica de envío según valor del carrito
   const shippingCost = getShippingCost(totalPrice);
   const formatShipping = shippingCost === 0 ? "Gratis" : formatPrice(shippingCost)
   const totalWithShipping = totalPrice + shippingCost
-
-  // Mensaje dinámico de incentivo más motivador
-  let shippingMessage = getShippingMessage(totalPrice)  
+  const shippingMessage = getShippingMessage(totalPrice)  
 
   return (
     <div className="min-h-screen bg-background">
@@ -64,7 +61,7 @@ export default function CartPage() {
 
                 return (
                   <div
-                    key={item.id}
+                    key={`${item.id}-${item.variante ?? "default"}`}
                     className="flex gap-4 p-4 bg-card rounded-xl border border-border animate-slide-up"
                   >
                     <div className="relative w-24 h-24 rounded-lg overflow-hidden bg-muted shrink-0">
@@ -79,6 +76,12 @@ export default function CartPage() {
                         {item.nombre}
                       </Link>
 
+                      {item.variante && (
+                        <p className="text-sm text-muted-foreground mt-1">
+                          {item.variante}
+                        </p>
+                      )}
+
                       <div className="flex items-center gap-2 mt-1">
                         <span className="text-lg font-bold text-primary">{formatPrice(item.precioFinal)}</span>
                         {discount > 0 && (
@@ -91,7 +94,7 @@ export default function CartPage() {
                       <div className="flex items-center justify-between mt-3">
                         <div className="flex items-center border border-border rounded-lg overflow-hidden">
                           <button
-                            onClick={() => updateQuantity(item.id, item.cantidad - 1)}
+                            onClick={() => updateQuantity(item.id, item.cantidad - 1, item.variante)}
                             className="p-1.5 hover:bg-muted transition-colors"
                           >
                             <Minus className="w-4 h-4" />
@@ -100,7 +103,7 @@ export default function CartPage() {
                             {item.cantidad}
                           </span>
                           <button
-                            onClick={() => updateQuantity(item.id, item.cantidad + 1)}
+                            onClick={() => updateQuantity(item.id, item.cantidad + 1, item.variante)}
                             className="p-1.5 hover:bg-muted transition-colors"
                           >
                             <Plus className="w-4 h-4" />
@@ -108,7 +111,7 @@ export default function CartPage() {
                         </div>
 
                         <button
-                          onClick={() => removeFromCart(item.id)}
+                          onClick={() => removeFromCart(item.id, item.variante)}
                           className="p-2 text-destructive hover:bg-destructive/10 rounded-lg transition-colors"
                         >
                           <Trash2 className="w-5 h-5" />

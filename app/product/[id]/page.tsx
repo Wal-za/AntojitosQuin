@@ -23,6 +23,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const [isAdding, setIsAdding] = useState(false)
   const [mounted, setMounted] = useState(false)
   const [selectedImage, setSelectedImage] = useState<string | null>(null)
+  const [selectedVariant, setSelectedVariant] = useState("")
 
   useEffect(() => {
     setMounted(true)
@@ -56,7 +57,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     )
   }
 
-  // Aseguramos que product.imagenes sea un array
+  // Imagenes
   const images = product.imagenes && product.imagenes.length > 0 ? product.imagenes : [product.imagen]
 
   const discount = product.precioOriginal
@@ -76,6 +77,9 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   }
 
   const handleAddToCart = () => {
+    // No permitir agregar si hay variantes y no se ha seleccionado ninguna
+    if (product.variantes && selectedVariant === "") return
+
     setIsAdding(true)
     for (let i = 0; i < quantity; i++) {
       addToCart({
@@ -84,7 +88,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         precioCompra: product.precioCompra,
         precioFinal: product.precioFinal,
         precioOriginal: product.precioOriginal,
-        imagen: images[0], // siempre usamos la primera imagen
+        imagen: images[0],
+        variante: selectedVariant || undefined,
       })
     }
     setTimeout(() => setIsAdding(false), 300)
@@ -196,6 +201,27 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               </span>
             </div>
 
+            {/* Variant Selector */}
+            {product.variantes && product.variantes.opciones.length > 0 && (
+              <div className="mb-4">
+                <label className="text-sm font-medium mb-1 block">
+                  {product.variantes.tipo[0].toUpperCase() + product.variantes.tipo.slice(1)}:
+                </label>
+                <select
+                  value={selectedVariant}
+                  onChange={(e) => setSelectedVariant(e.target.value)}
+                  className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary outline-none"
+                >
+                  <option value="">Selecciona {product.variantes.tipo}</option>
+                  {product.variantes.opciones.map((opt) => (
+                    <option key={opt} value={opt}>
+                      {opt}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
+
             {/* Quantity Selector */}
             <div className="flex items-center gap-4 mb-6">
               <span className="text-foreground font-medium">Cantidad:</span>
@@ -220,7 +246,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex gap-3">
               <button
                 onClick={handleAddToCart}
-                disabled={product.stock === 0}
+                disabled={product.stock === 0 || (product.variantes && selectedVariant === "")}
                 className={cn(
                   "flex-1 py-3 rounded-xl font-semibold text-lg",
                   "flex items-center justify-center gap-2",

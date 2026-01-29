@@ -47,6 +47,7 @@
     "embla-carousel-react": "8.5.1",
     "gcp-metadata": "latest",
     "input-otp": "1.4.1",
+    "js-cookie": "^3.0.5",
     "kerberos": "latest",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.454.0",

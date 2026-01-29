@@ -72,12 +72,34 @@ export default function CheckoutPage() {
 
   const [policyAccepted, setPolicyAccepted] = useState(false)
   const [showPolicyModal, setShowPolicyModal] = useState(false)
+  const [rememberInfo, setRememberInfo] = useState(false) // Nuevo checkbox
 
   useEffect(() => {
     if (items.length === 0) {
       router.push("/cart")
     }
   }, [items, router])
+
+  // Recuperar cookie si existe
+  useEffect(() => {
+    const cookieData = document.cookie.split("; ").find(row => row.startsWith("checkoutData="))
+    if (cookieData) {
+      try {
+        const parsed = JSON.parse(decodeURIComponent(cookieData.split("=")[1]))
+        setFormData({
+          nombre: parsed.nombre || "",
+          direccion: parsed.direccion || "",
+          telefono: parsed.telefono || "",
+          correo: parsed.correo || ""
+        })
+        setDepartamento(parsed.departamento || "")
+        setCiudad(parsed.ciudad || "")
+        setRememberInfo(true)
+      } catch (err) {
+        console.error("Error leyendo cookie de checkout:", err)
+      }
+    }
+  }, [])
 
   const validateField = (name: keyof FormData, value: string): string | undefined => {
     switch (name) {
@@ -147,9 +169,15 @@ export default function CheckoutPage() {
 
     if (isFormValid()) {
       const fullAddress = `${departamento}, ${ciudad}, ${formData.direccion}`
-      const dataToSave = { ...formData, direccion: fullAddress }
+      const dataToSave = { ...formData, direccion: fullAddress, departamento, ciudad }
 
       localStorage.setItem("antojitosquin-checkout", JSON.stringify(dataToSave))
+
+      // Guardar en cookie si el usuario marcó "recordar"
+      if (rememberInfo) {
+        document.cookie = `checkoutData=${encodeURIComponent(JSON.stringify(dataToSave))}; path=/; max-age=${60*60*24*30}` // 30 días
+      }
+
       router.push("/payment")
     }
   }
@@ -280,51 +308,48 @@ export default function CheckoutPage() {
               <label htmlFor="correo" className="block text-sm font-medium text-foreground mb-2">Correo electrónico</label>
               <div className="relative">
                 <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
-                <input type="email" id="correo" name="correo" value={formData.correo} onChange={handleChange} onBlur={handleBlur} placeholder="juan@email.com" className={inputClasses("correo")} />
+                <input type="email" id="correo" name="correo" value={formData.correo} onChange={handleChange} onBlur={handleBlur} placeholder="correo@ejemplo.com" className={inputClasses("correo")} />
                 {!errors.correo && touched.correo && formData.correo && <Check className="absolute right-4 top-1/2 -translate-y-1/2 w-5 h-5 text-accent" />}
               </div>
               {errors.correo && touched.correo && <p className="mt-1 text-sm text-destructive">{errors.correo}</p>}
             </div>
-          </div>
 
-          {/* Shipping & Total */}
-          <div className="bg-card rounded-xl border border-border p-6 space-y-4">
-            {shippingMessage && (
-              <p className="text-sm text-green-800" dangerouslySetInnerHTML={{ __html: shippingMessage }}></p>
-            )}
-            <div className="flex justify-between text-sm">
-              <span>Subtotal:</span>
-              <span>{formatPrice(totalPrice)}</span>
+            {/* Checkbox recordar info */}
+            <div className="flex items-center">
+              <input type="checkbox" id="recordar" checked={rememberInfo} onChange={(e) => setRememberInfo(e.target.checked)} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"/>
+              <label htmlFor="recordar" className="ml-2 block text-sm text-foreground">Recordarme</label>
             </div>
-            <div className="flex justify-between text-sm">
-              <span>Envío:</span>
-              <span>{formatShipping}</span>
-            </div>
-            <div className="flex justify-between font-bold text-lg">
-              <span>Total:</span>
-              <span>{formatPrice(totalWithShipping)}</span>
-            </div>
-          </div>
 
-          {/* Política de datos */}
-          <div className="flex items-center gap-2">
-            <input type="checkbox" id="policy" checked={policyAccepted} onChange={() => setPolicyAccepted(!policyAccepted)} />
-            <label htmlFor="policy" className="text-sm text-foreground">Acepto la <button type="button" onClick={() => setShowPolicyModal(true)} className="text-primary underline">política de datos</button></label>
-          </div>
+            {/* Checkbox política */}
+            <div className="flex items-center">
+              <input type="checkbox" id="policy" checked={policyAccepted} onChange={() => setPolicyAccepted(!policyAccepted)} className="h-4 w-4 text-primary focus:ring-primary border-gray-300 rounded"/>
+              <label htmlFor="policy" className="ml-2 block text-sm text-foreground">
+                He leído y acepto la <button type="button" onClick={() => setShowPolicyModal(true)} className="underline text-primary">política de privacidad</button>
+              </label>
+            </div>
 
-          <button type="submit" disabled={!policyAccepted} className="w-full py-3 px-6 rounded-xl bg-primary text-primary-foreground font-bold disabled:opacity-50 disabled:cursor-not-allowed">Continuar</button>
+            <button type="submit" disabled={!policyAccepted} className="w-full bg-primary text-primary-foreground py-3 rounded-xl font-semibold disabled:opacity-50 disabled:cursor-not-allowed">
+              Continuar al pago
+            </button>
+          </div>
         </form>
 
-        {/* Modal */}
-        {showPolicyModal && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
-            <div className="bg-white p-6 rounded-xl max-w-lg w-full">
-              <h2 className="text-xl font-bold mb-4">Política de Datos</h2>
-              <p className="mb-4">Aquí va la política de tratamiento de datos.</p>
-              <button onClick={() => setShowPolicyModal(false)} className="px-4 py-2 bg-primary text-white rounded-lg">Cerrar</button>
-            </div>
+        {/* Resumen */}
+        <div className="mt-8 bg-card p-6 rounded-xl border border-border space-y-3">
+          <div className="flex justify-between">
+            <span>Subtotal</span>
+            <span>{formatPrice(totalPrice)}</span>
           </div>
-        )}
+          <div className="flex justify-between">
+            <span>Envío</span>
+            <span>{formatShipping}</span>
+          </div>
+          <div className="flex justify-between font-bold text-lg">
+            <span>Total</span>
+            <span>{formatPrice(totalWithShipping)}</span>
+          </div>
+          {shippingMessage && <p className="text-sm text-muted-foreground">{shippingMessage}</p>}
+        </div>
       </main>
     </div>
   )

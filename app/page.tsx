@@ -121,39 +121,40 @@ export default function HomePage() {
       {/* Offers Section */}
       {!searchQuery && !selectedCategory && !categoryParam && !loading && <OffersSection />}
 
-      {/* Productos Recomendados */}
-      {newProducts.length > 0 && !searchQuery && !selectedCategory && !categoryParam && !loading && (
-        <section className="py-6 px-4 max-w-7xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-primary mb-6">¡Recomendados!</h2>
-          <div className="grid grid-cols-2 gap-2 md:gap-6">
-            {shuffleArray(newProducts).slice(0, 2).map((product) => (
-              <div
-                key={product.id}
-                className="p-2 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:scale-105"
-              >
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+     {/* Productos Recomendados */}
+{newProducts.length > 0 && !searchQuery && !selectedCategory && !categoryParam && !loading && (
+  <section className="py-6 px-4 max-w-7xl mx-auto">
+    <h2 className="text-2xl font-extrabold text-primary mb-6">¡Recomendados!</h2>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+      {shuffleArray(newProducts).slice(0, 4).map((product) => (
+        <div
+          key={product.id}
+          className="p-2 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:scale-105"
+        >
+          <ProductCard product={product} />
+        </div>
+      ))}
+    </div>
+  </section>
+)}
 
-      {/* Productos Nuevos */}
-      {popularProducts.length > 0 && !searchQuery && !selectedCategory && !categoryParam && !loading && (
-        <section className="py-6 px-4 max-w-7xl mx-auto">
-          <h2 className="text-2xl font-extrabold text-primary mb-6">Nuevos</h2>
-          <div className="grid grid-cols-2 gap-2 md:gap-6">
-            {shuffleArray(popularProducts).slice(0, 2).map((product) => (
-              <div
-                key={product.id}
-                className="p-2 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:scale-105"
-              >
-                <ProductCard product={product} />
-              </div>
-            ))}
-          </div>
-        </section>
-      )}
+{/* Productos Nuevos */}
+{popularProducts.length > 0 && !searchQuery && !selectedCategory && !categoryParam && !loading && (
+  <section className="py-6 px-4 max-w-7xl mx-auto">
+    <h2 className="text-2xl font-extrabold text-primary mb-6">Nuevos</h2>
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-2 md:gap-4">
+      {shuffleArray(popularProducts).slice(0, 4).map((product) => (
+        <div
+          key={product.id}
+          className="p-2 bg-white rounded-lg shadow-lg hover:shadow-xl transition-shadow duration-300 transform hover:scale-105"
+        >
+          <ProductCard product={product} />
+        </div>
+      ))}
+    </div>
+  </section>
+)}
+
 
 
       {/* Search Results Info */}

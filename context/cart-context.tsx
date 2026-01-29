@@ -8,17 +8,18 @@ export interface CartItem {
   nombre: string
   precioFinal: number
   precioOriginal: number
-  precioCompra: number // <-- nuevo campo
+  precioCompra: number
   imagen: string
   cantidad: number
+  variante?: string
 }
 
 // Definición del contexto del carrito
 interface CartContextType {
   items: CartItem[]
   addToCart: (product: Omit<CartItem, "cantidad">) => void
-  removeFromCart: (id: number) => void
-  updateQuantity: (id: number, cantidad: number) => void
+  removeFromCart: (id: number, variante?: string) => void
+  updateQuantity: (id: number, cantidad: number, variante?: string) => void
   clearCart: () => void
   totalItems: number
   totalPrice: number
@@ -46,39 +47,52 @@ export function CartProvider({ children }: { children: ReactNode }) {
     localStorage.setItem("antojitosquin-cart", JSON.stringify(items))
   }, [items])
 
-
   // Función para agregar un producto al carrito
   const addToCart = (product: Omit<CartItem, "cantidad">) => {
     setCartAnimating(true)
     setTimeout(() => setCartAnimating(false), 300)
 
     setItems((prev) => {
-      const existing = prev.find((item) => item.id === product.id)
+      const existing = prev.find(
+        (item) =>
+          item.id === product.id &&
+          (item.variante ?? "") === (product.variante ?? "")
+      )
+
       if (existing) {
         return prev.map((item) =>
-          item.id === product.id
+          item.id === product.id &&
+          (item.variante ?? "") === (product.variante ?? "")
             ? { ...item, cantidad: item.cantidad + 1 }
             : item
         )
       }
+
       return [...prev, { ...product, cantidad: 1 }]
     })
   }
 
   // Función para eliminar un producto del carrito
-  const removeFromCart = (id: number) => {
-    setItems((prev) => prev.filter((item) => item.id !== id))
+  const removeFromCart = (id: number, variante?: string) => {
+    setItems((prev) =>
+      prev.filter(
+        (item) =>
+          item.id !== id || (item.variante ?? "") !== (variante ?? "")
+      )
+    )
   }
 
   // Función para actualizar la cantidad de un producto
-  const updateQuantity = (id: number, cantidad: number) => {
+  const updateQuantity = (id: number, cantidad: number, variante?: string) => {
     if (cantidad <= 0) {
-      removeFromCart(id)
+      removeFromCart(id, variante)
       return
     }
     setItems((prev) =>
       prev.map((item) =>
-        item.id === id ? { ...item, cantidad } : item
+        item.id === id && (item.variante ?? "") === (variante ?? "")
+          ? { ...item, cantidad }
+          : item
       )
     )
   }

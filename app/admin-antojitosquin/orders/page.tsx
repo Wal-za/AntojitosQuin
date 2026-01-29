@@ -285,7 +285,7 @@ export default function AdminOrdersPage() {
                     {selectedOrder.productos.map((item) => (
                       <div key={item.id} className="flex justify-between items-center p-2 bg-muted rounded-lg">
                         <div>
-                          <p className="font-medium text-foreground">{item.nombre}</p>
+                          <p className="font-medium text-foreground"> {item.nombre}{item.variante ? ` ${item.variante}` : ""}</p>
                           <p className="text-sm text-muted-foreground">Cantidad: {item.cantidad}</p>
                         </div>
                         <p className="font-medium text-foreground">{formatPrice(item.precioFinal * item.cantidad)}</p>

@@ -8,6 +8,11 @@ import { useProducts, type Product } from "@/context/products-context"
 import { Plus, Pencil, Trash2, X, Search, Loader2, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
 
+type ProductVariantes = {
+  tipo: "" | "talla" | "fragancia" | "color"
+  opciones: string[]
+}
+
 interface ProductFormData {
   nombre: string
   categoria: string
@@ -18,7 +23,11 @@ interface ProductFormData {
   imagenes: string[]
   etiqueta: string
   stock: number | null
+
+  // 👉 NUEVO
+  variantes: ProductVariantes
 }
+
 
 const emptyForm: ProductFormData = {
   nombre: "",
@@ -30,7 +39,14 @@ const emptyForm: ProductFormData = {
   imagenes: [""],
   etiqueta: "",
   stock: null,
+
+  // 👉 NUEVO
+  variantes: {
+    tipo: "",
+    opciones: [""]
+  }
 }
+
 
 const etiquetaOptions = ["", "Nuevo", "Popular", "Más vendido", "Recomendado"]
 const PRODUCTS_PER_PAGE = 20
@@ -86,12 +102,33 @@ export default function AdminProductsPage() {
         categoria: product.categoria,
         precioCompra: product.precioCompra,
         precioOriginal: product.precioOriginal,
-        precioFinal: product.precioOriginal === product.precioFinal ? 0 : product.precioFinal,
+        precioFinal:
+          product.precioOriginal === product.precioFinal
+            ? 0
+            : product.precioFinal,
         descripcion: product.descripcion,
-        imagenes: product.imagenes && product.imagenes.length > 0 ? product.imagenes : [""],
+        imagenes:
+          product.imagenes && product.imagenes.length > 0
+            ? product.imagenes
+            : [""],
         etiqueta: product.etiqueta || "",
         stock: product.stock,
-      })
+
+        // 👉 VARIANTES (NUEVO)
+        variantes: product.variantes
+          ? {
+            tipo: product.variantes.tipo || "",
+            opciones:
+              product.variantes.opciones && product.variantes.opciones.length > 0
+                ? product.variantes.opciones
+                : [""]
+          }
+          : {
+            tipo: "",
+            opciones: [""]
+          }
+      });
+
     } else {
       setEditingProduct(null)
       setFormData(emptyForm)
@@ -527,6 +564,107 @@ export default function AdminProductsPage() {
                       required
                     />
                   </div>
+                </div>
+
+                {/* VARIANTES */}
+                <div className="bg-muted/40 p-4 rounded-xl border border-border space-y-4">
+                  <h3 className="font-semibold text-lg">Variantes del Producto</h3>
+
+                  {/* TIPO DE VARIANTE */}
+                  <div className="space-y-2">
+                    <label className="text-sm font-medium">Tipo de variante</label>
+                    <select
+                      value={formData.variantes.tipo}
+                      onChange={(e) =>
+                        setFormData(prev => ({
+                          ...prev,
+                          variantes: {
+                            tipo: e.target.value,
+                            opciones: [""]
+                          }
+                        }))
+                      }
+                      className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
+                    >
+                      <option value="">Sin variantes</option>
+                      <option value="talla">Tallas</option>
+                      <option value="fragancia">Fragancias</option>
+                      <option value="color">Colores</option>
+                    </select>
+                  </div>
+
+                  {/* OPCIONES */}
+                  {formData.variantes.tipo && (
+                    <div className="space-y-3">
+                      <label className="text-sm font-medium">
+                        Opciones de {formData.variantes.tipo}
+                      </label>
+
+                      {formData.variantes.opciones.map((opcion, index) => (
+                        <div key={index} className="flex gap-2">
+                          <input
+                            type="text"
+                            value={opcion}
+                            onChange={(e) => {
+                              const nuevasOpciones = [...formData.variantes.opciones];
+                              nuevasOpciones[index] = e.target.value;
+                              setFormData(prev => ({
+                                ...prev,
+                                variantes: {
+                                  ...prev.variantes,
+                                  opciones: nuevasOpciones
+                                }
+                              }));
+                            }}
+                            placeholder={
+                              formData.variantes.tipo === "talla"
+                                ? "Ej: M"
+                                : formData.variantes.tipo === "fragancia"
+                                  ? "Ej: Fresa"
+                                  : "Ej: Rojo"
+                            }
+                            className="flex-1 px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
+                            required
+                          />
+
+                          <button
+                            type="button"
+                            onClick={() => {
+                              const nuevasOpciones = formData.variantes.opciones.filter(
+                                (_, i) => i !== index
+                              );
+                              setFormData(prev => ({
+                                ...prev,
+                                variantes: {
+                                  ...prev.variantes,
+                                  opciones: nuevasOpciones.length ? nuevasOpciones : [""]
+                                }
+                              }));
+                            }}
+                            className="px-3 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                          >
+                            Eliminar
+                          </button>
+                        </div>
+                      ))}
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setFormData(prev => ({
+                            ...prev,
+                            variantes: {
+                              ...prev.variantes,
+                              opciones: [...prev.variantes.opciones, ""]
+                            }
+                          }))
+                        }
+                        className="text-sm font-medium text-primary"
+                      >
+                        + Agregar opción
+                      </button>
+                    </div>
+                  )}
                 </div>
 
                 {/* IMÁGENES */}

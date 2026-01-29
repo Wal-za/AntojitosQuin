@@ -50,7 +50,7 @@ export async function sendOrderEmail(order: any) {
                 <div style="display: flex; align-items: center; margin-bottom: 15px; border-bottom: 1px solid #eee; padding-bottom: 10px;">
                   <img src="${item.imagen}" alt="${item.nombre}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px;"/>
                   <div>
-                    <p style="margin: 0; font-weight: bold;">${item.nombre}</p>
+                    <p style="margin: 0; font-weight: bold;">${item.nombre}${item.variante ? ` ${item.variante}` : ""}</p>
                     <p style="margin: 2px 0;">Cantidad: ${item.cantidad}</p>
                     <p style="margin: 2px 0;">Precio: $${item.precioFinal.toLocaleString()}</p>
                   </div>

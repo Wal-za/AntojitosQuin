@@ -63,7 +63,7 @@ export function ProductCard({ product }: ProductCardProps) {
   return (
     <Link href={`/product/${product.id}`} className="h-full">
       <article className="group bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-border hover:border-primary/30 animate-slide-up flex flex-col h-full">
-        
+
         {/* Imagen */}
         <div className="relative aspect-square overflow-hidden bg-muted">
           <Image
@@ -91,19 +91,7 @@ export function ProductCard({ product }: ProductCardProps) {
               {product.etiqueta}
             </div>
           )}
-
-          {/* Botón rápido agregar */}
-          <button
-            onClick={handleAddToCart}
-            className={cn(
-              "absolute bottom-2 right-2 p-2 rounded-full bg-primary text-primary-foreground shadow-lg",
-              "opacity-0 group-hover:opacity-100 transition-all duration-200",
-              "hover:scale-110 active:scale-95",
-              isAdding && "animate-bounce-small"
-            )}
-          >
-            <Plus className="w-5 h-5" />
-          </button>
+          
         </div>
 
         {/* Contenido */}
@@ -129,7 +117,7 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
 
-          {/* Botón agregar */}
+          {/* Botón agregar 
           <button
             onClick={handleAddToCart}
             className={cn(
@@ -142,6 +130,7 @@ export function ProductCard({ product }: ProductCardProps) {
             <ShoppingCart className="w-4 h-4" />
             Agregar
           </button>
+          */}
         </div>
       </article>
     </Link>

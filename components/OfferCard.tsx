@@ -83,18 +83,7 @@ export function OfferCard({ product }: OfferCardProps) {
                         </div>
                     )}
 
-                    {/* Botón agregar rápido */}
-                    <button
-                        onClick={handleAddToCart}
-                        className={cn(
-                            "absolute bottom-2 right-2 p-2 rounded-full bg-gradient-to-r from-orange-400 via-red-400 to-pink-400 text-white shadow-lg",
-                            "opacity-0 group-hover:opacity-100 transition-all duration-200",
-                            "hover:scale-110 active:scale-95",
-                            isAdding && "animate-bounce-small"
-                        )}
-                    >
-                        <Plus className="w-5 h-5" />
-                    </button>
+                   
                 </div>
 
                 {/* Contenido */}
@@ -121,7 +110,7 @@ export function OfferCard({ product }: OfferCardProps) {
                         )}
                     </div>
 
-                    {/* Botón agregar grande */}
+                    {/* Botón agregar grande 
                     <button
                         onClick={handleAddToCart}
                         className={cn(
@@ -132,6 +121,7 @@ export function OfferCard({ product }: OfferCardProps) {
                         <ShoppingCart className="w-5 h-5" />
                         ¡Lo quiero!
                     </button>
+                    */}
                 </div>
             </article>
         </Link>
