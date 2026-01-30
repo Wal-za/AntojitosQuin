@@ -201,11 +201,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
                       : "bg-destructive/20 text-destructive",
                 )}
               >
-                {product.stock > 10
+                {/*
+                descomentar la gestion de stock cuando se maneje inventario 
+                product.stock > 10
                   ? `En stock (${product.stock} disponibles)`
                   : product.stock > 0
                     ? `¡Solo quedan ${product.stock}!`
-                    : "Agotado"}
+                    : "Agotado"
+                    */}
               </span>
             </div>
 
