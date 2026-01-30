@@ -7,6 +7,7 @@ import { AdminLayout } from "@/components/admin/admin-layout"
 import { useProducts, type Product } from "@/context/products-context"
 import { Plus, Pencil, Trash2, X, Search, Loader2, RefreshCw, ChevronLeft, ChevronRight } from "lucide-react"
 import { cn } from "@/lib/utils"
+import "@/styles/globals2.css";
 
 type ProductVariantes = {
   tipo: "" | "talla" | "fragancia" | "color"
