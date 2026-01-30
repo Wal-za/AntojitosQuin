@@ -54,16 +54,16 @@ export function OfferCard({ product }: OfferCardProps) {
     }
 
     const capitalizeWords = (text: string) => {
-  return text
-    .split(" ")
-    .map(word => {
-      if (word.length === 0) return ""
-      const firstLetter = word[0].toLocaleUpperCase("es")
-      const rest = word.slice(1).toLocaleLowerCase("es")
-      return firstLetter + rest
-    })
-    .join(" ")
-}
+        return text
+            .split(" ")
+            .map(word => {
+                if (word.length === 0) return ""
+                const firstLetter = word[0].toLocaleUpperCase("es")
+                const rest = word.slice(1).toLocaleLowerCase("es")
+                return firstLetter + rest
+            })
+            .join(" ")
+    }
 
     return (
         <Link href={`/product/${product.id}`} className="h-full">
@@ -95,7 +95,7 @@ export function OfferCard({ product }: OfferCardProps) {
                         </div>
                     )}
 
-                   
+
                 </div>
 
                 {/* Contenido */}

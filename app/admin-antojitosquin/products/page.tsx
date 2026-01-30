@@ -74,6 +74,7 @@ export default function AdminProductsPage() {
     localStorage.setItem("adminProductsPage", newPage.toString())
   }
 
+  //buscador
   const filteredProducts = products.filter(
     (p) =>
       p.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -171,6 +172,18 @@ export default function AdminProductsPage() {
     }
   }
 
+    const capitalizeWords = (text: string) => {
+        return text
+            .split(" ")
+            .map(word => {
+                if (word.length === 0) return ""
+                const firstLetter = word[0].toLocaleUpperCase("es")
+                const rest = word.slice(1).toLocaleLowerCase("es")
+                return firstLetter + rest
+            })
+            .join(" ")
+    }
+
   const handleDelete = async (id: number) => {
     try {
       await deleteProduct(id)
@@ -243,7 +256,7 @@ export default function AdminProductsPage() {
           <input
             type="text"
             placeholder="Buscar productos..."
-            value={searchQuery}
+            value={searchQuery.trim()}
             onChange={(e) => {
               setSearchQuery(e.target.value)
               handlePageChange(1)
@@ -284,17 +297,17 @@ export default function AdminProductsPage() {
                           <td className="px-4 py-3">
                             <div className="flex items-center gap-3">
                               <div className="w-12 h-12 rounded-lg overflow-hidden bg-muted shrink-0">
-                               <Image
-  src={(product.imagenes[0]?.trim() || "/placeholder.svg")}
-  alt={product.nombre}
-  width={48}
-  height={48}
-  className="w-full h-full object-cover"
-/>
+                                <Image
+                                  src={(product.imagenes[0]?.trim() || "/placeholder.svg")}
+                                  alt={product.nombre}
+                                  width={48}
+                                  height={48}
+                                  className="w-full h-full object-cover"
+                                />
 
                               </div>
                               <div className="min-w-0">
-                                <p className="font-medium text-foreground truncate max-w-[200px]">{product.nombre}</p>
+                                <p className="font-medium text-foreground truncate max-w-[200px]">{capitalizeWords(product.nombre)}</p>
                                 {product.etiqueta && (
                                   <span className="text-xs px-1.5 py-0.5 bg-primary/10 text-primary rounded">
                                     {product.etiqueta}
@@ -420,7 +433,7 @@ export default function AdminProductsPage() {
                         />
                       </div>
                       <div className="flex-1 min-w-0">
-                        <p className="font-bold text-foreground truncate">{product.nombre}</p>
+                        <p className="font-bold text-foreground truncate">{capitalizeWords(product.nombre)}</p>
                         {product.etiqueta && (
                           <span className="text-xs px-2 py-0.5 bg-primary/10 text-primary rounded">
                             {product.etiqueta}
