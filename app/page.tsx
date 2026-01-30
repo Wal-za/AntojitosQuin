@@ -91,9 +91,18 @@ export default function HomePage() {
   }
 
   function capitalizeFirstLetter(str: string | null) {
-    if (!str) return ""
-    return str.charAt(0).toUpperCase() + str.slice(1)
-  }
+  if (!str) return ""
+  return str
+    .split(" ")
+    .map(word => {
+      if (word.length === 0) return ""
+      const firstLetter = word[0].toLocaleUpperCase("es") 
+      const rest = word.slice(1).toLocaleLowerCase("es") 
+      return firstLetter + rest
+    })
+    .join(" ")
+}
+
 
   // Función para mezclar un array
   const shuffleArray = (array) => {

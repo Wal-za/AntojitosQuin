@@ -53,6 +53,18 @@ export function OfferCard({ product }: OfferCardProps) {
         }
     }
 
+    const capitalizeWords = (text: string) => {
+  return text
+    .split(" ")
+    .map(word => {
+      if (word.length === 0) return ""
+      const firstLetter = word[0].toLocaleUpperCase("es")
+      const rest = word.slice(1).toLocaleLowerCase("es")
+      return firstLetter + rest
+    })
+    .join(" ")
+}
+
     return (
         <Link href={`/product/${product.id}`} className="h-full">
             <article className="group relative flex flex-col bg-gradient-to-b from-orange-100 via-orange-50 to-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden border border-orange-200 h-full">
@@ -90,7 +102,7 @@ export function OfferCard({ product }: OfferCardProps) {
                 <div className="p-4 flex-1 flex flex-col">
 
                     <h3 className="font-bold text-lg text-orange-900 group-hover:text-orange-700 transition-colors line-clamp-2">
-                        {product.nombre}
+                        {capitalizeWords(product.nombre)}
                     </h3>
 
                     <p className="text-sm text-orange-800 line-clamp-3 flex-1 mb-3">

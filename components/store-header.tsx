@@ -19,11 +19,7 @@ export function StoreHeader() {
   const categoryRef = useRef<HTMLDivElement>(null)
   const router = useRouter()
 
-  const categoryList = [
-    { id: "all", name: "Todas las Categorías" },
-    ...categories.map((cat) => ({ id: cat.toLowerCase(), name: cat })),
-  ]
-
+  // Función para normalizar texto (minúsculas, sin acentos)
   const normalizeText = (text: string) => {
     return text
       .trim()
@@ -31,6 +27,34 @@ export function StoreHeader() {
       .normalize("NFD")
       .replace(/[\u0300-\u036f]/g, "")
   }
+
+  // Función para capitalizar la primera letra de cada palabra
+  const capitalizeWords = (text: string) => {
+  return text
+    .split(" ")
+    .map(word => {
+      if (word.length === 0) return ""
+      const firstLetter = word[0].toLocaleUpperCase() // usa la configuración local para mayúsculas
+      const rest = word.slice(1)
+      return firstLetter + rest
+    })
+    .join(" ")
+}
+
+
+  // Map para eliminar duplicados ignorando mayúsculas/minúsculas
+  const normalizedCategoriesMap = new Map<string, { id: string; name: string }>()
+  categories.forEach((cat) => {
+    const normalizedId = normalizeText(cat)
+    if (!normalizedCategoriesMap.has(normalizedId)) {
+      normalizedCategoriesMap.set(normalizedId, { id: normalizedId, name: cat })
+    }
+  })
+
+  const categoryList = [
+    { id: "all", name: "Todas las Categorías" },
+    ...Array.from(normalizedCategoriesMap.values())
+  ]
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -81,7 +105,6 @@ export function StoreHeader() {
             <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-md">
               <Store className="w-5 h-5 text-primary-foreground" />
             </div>
-            {/* Nombre solo desktop */}
             <div className="hidden md:flex flex-col">
               <span className="font-bold text-xl text-foreground leading-tight">AntojitosQuin</span>
               <span className="text-[10px] text-muted-foreground -mt-0.5">Tu tienda virtual</span>
@@ -97,7 +120,7 @@ export function StoreHeader() {
                 categoryOpen && "ring-2 ring-primary/30"
               )}
             >
-              <span className="font-medium text-sm text-foreground">{selectedCategoryName}</span>
+              <span className="font-medium text-sm text-foreground">{capitalizeWords(selectedCategoryName)}</span>
               <ChevronDown
                 className={cn(
                   "w-4 h-4 text-muted-foreground transition-transform",
@@ -117,7 +140,7 @@ export function StoreHeader() {
                       selectedCategoryName === category.name && "bg-primary/10 text-primary"
                     )}
                   >
-                    <span className="font-medium text-sm">{category.name}</span>
+                    <span className="font-medium text-sm">{capitalizeWords(category.name)}</span>
                   </button>
                 ))}
               </div>
@@ -145,10 +168,7 @@ export function StoreHeader() {
           </form>
 
           {/* Mobile Search Bar */}
-          <form
-            onSubmit={handleSearch}
-            className="flex md:hidden flex-1 relative"
-          >
+          <form onSubmit={handleSearch} className="flex md:hidden flex-1 relative">
             <input
               type="text"
               placeholder="Buscar..."
@@ -199,7 +219,7 @@ export function StoreHeader() {
                     selectedCategoryName === category.name && "bg-primary/10 text-primary"
                   )}
                 >
-                  <span className="font-medium">{category.name}</span>
+                  <span className="font-medium">{capitalizeWords(category.name)}</span>
                 </button>
               ))}
             </nav>

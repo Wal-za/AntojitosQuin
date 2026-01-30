@@ -108,6 +108,21 @@ export default function AdminStatsPage() {
 
   const maxStatusValue = Math.max(...statusData.map((s) => s.value), 1)
 
+  function capitalizeFirstLetter(str: string | null) {
+    if (!str) return ""
+    return str
+      .split(" ")
+      .map(word => {
+        if (word.length === 0) return ""
+        const firstLetter = word[0].toLocaleUpperCase("es")
+        const rest = word.slice(1).toLocaleLowerCase("es")
+        return firstLetter + rest
+      })
+      .join(" ")
+  }
+
+
+
   return (
     <AdminLayout>
       <div className="space-y-8">
@@ -228,7 +243,7 @@ export default function AdminStatsPage() {
                   p.ingresos - p.precioCompra * p.cantidad
                 return (
                   <tr key={p.nombre} className="border-b last:border-0">
-                    <td className="py-2">{p.nombre}</td>
+                    <td className="py-2">{capitalizeFirstLetter(p.nombre)}</td>
                     <td className="text-center">{p.cantidad}</td>
                     <td className="text-center text-primary">
                       {formatPrice(p.ingresos)}

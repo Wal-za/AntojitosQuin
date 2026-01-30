@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import Image from "next/image"
 import Link from "next/link"
 import { ShoppingCart, Plus } from "lucide-react"
@@ -60,6 +59,20 @@ export function ProductCard({ product }: ProductCardProps) {
     }
   }
 
+  // Función que capitaliza la primera letra de cada palabra y pone el resto en minúscula, respetando acentos
+const capitalizeWords = (text: string) => {
+  return text
+    .split(" ")
+    .map(word => {
+      if (word.length === 0) return ""
+      const firstLetter = word[0].toLocaleUpperCase("es")
+      const rest = word.slice(1).toLocaleLowerCase("es")
+      return firstLetter + rest
+    })
+    .join(" ")
+}
+
+
   return (
     <Link href={`/product/${product.id}`} className="h-full">
       <article className="group bg-card rounded-xl overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 border border-border hover:border-primary/30 animate-slide-up flex flex-col h-full">
@@ -73,14 +86,14 @@ export function ProductCard({ product }: ProductCardProps) {
             className="object-cover group-hover:scale-105 transition-transform duration-300"
           />
 
-          {/* Badge de descuento (más pequeño y más al borde) */}
+          {/* Badge de descuento */}
           {discount > 0 && (
             <div className="absolute top-2 left-2 bg-destructive text-destructive-foreground px-1.5 py-0.5 rounded-md text-[11px] font-semibold shadow-sm">
               -{discount}%
             </div>
           )}
 
-          {/* Badge de etiqueta (más pequeño y ajustado) */}
+          {/* Badge de etiqueta */}
           {product.etiqueta && (
             <div
               className={cn(
@@ -97,7 +110,7 @@ export function ProductCard({ product }: ProductCardProps) {
         {/* Contenido */}
         <div className="p-4 flex-1 flex flex-col">
           <h3 className="font-semibold text-foreground line-clamp-2 mb-2 group-hover:text-primary transition-colors">
-            {product.nombre}
+            {capitalizeWords(product.nombre)}
           </h3>
 
           <p className="text-sm text-muted-foreground line-clamp-3 mb-3 flex-1">
@@ -117,7 +130,8 @@ export function ProductCard({ product }: ProductCardProps) {
             )}
           </div>
 
-          {/* Botón agregar 
+          {/* Botón agregar */}
+          {/*
           <button
             onClick={handleAddToCart}
             className={cn(
