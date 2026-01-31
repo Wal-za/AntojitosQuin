@@ -74,11 +74,13 @@ export default function AdminProductsPage() {
     localStorage.setItem("adminProductsPage", newPage.toString())
   }
 
-  //buscador
+  //BUSCADOR
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+
   const filteredProducts = products.filter(
     (p) =>
-      p.nombre.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      p.categoria.toLowerCase().includes(searchQuery.toLowerCase())
+      p.nombre.toLowerCase().includes(normalizedQuery) ||
+      p.categoria.toLowerCase().includes(normalizedQuery)
   )
 
   const totalPages = Math.ceil(filteredProducts.length / PRODUCTS_PER_PAGE)
@@ -172,17 +174,17 @@ export default function AdminProductsPage() {
     }
   }
 
-    const capitalizeWords = (text: string) => {
-        return text
-            .split(" ")
-            .map(word => {
-                if (word.length === 0) return ""
-                const firstLetter = word[0].toLocaleUpperCase("es")
-                const rest = word.slice(1).toLocaleLowerCase("es")
-                return firstLetter + rest
-            })
-            .join(" ")
-    }
+  const capitalizeWords = (text: string) => {
+    return text
+      .split(" ")
+      .map(word => {
+        if (word.length === 0) return ""
+        const firstLetter = word[0].toLocaleUpperCase("es")
+        const rest = word.slice(1).toLocaleLowerCase("es")
+        return firstLetter + rest
+      })
+      .join(" ")
+  }
 
   const handleDelete = async (id: number) => {
     try {
@@ -256,7 +258,7 @@ export default function AdminProductsPage() {
           <input
             type="text"
             placeholder="Buscar productos..."
-            value={searchQuery.trim()}
+            value={searchQuery}
             onChange={(e) => {
               setSearchQuery(e.target.value)
               handlePageChange(1)
