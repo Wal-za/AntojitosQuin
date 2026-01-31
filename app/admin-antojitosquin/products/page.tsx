@@ -39,7 +39,7 @@ const emptyForm: ProductFormData = {
   descripcion: "",
   imagenes: [""],
   etiqueta: "",
-  stock: null,
+  stock: 1,
 
   // 👉 NUEVO
   variantes: {
@@ -155,7 +155,7 @@ export default function AdminProductsPage() {
         precioCompra: formData.precioCompra ?? 0,
         precioOriginal: formData.precioOriginal ?? 0,
         precioFinal: formData.precioFinal ?? 0,
-        stock: formData.stock ?? 10,
+        stock: formData.stock ?? 0,
         etiqueta: formData.etiqueta || null,
       }
       if (editingProduct) {

@@ -95,6 +95,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
     setTimeout(() => setIsAdding(false), 300)
   }
 
+  const hasSelectableVariants =
+    product?.variantes?.tipo?.trim() &&
+    product?.variantes?.opciones?.some((opt) => opt.trim() !== "");
+
+  console.log(product)
+
   return (
     <div className="min-h-screen bg-background">
       <StoreHeader />
@@ -214,25 +220,27 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             */}
 
             {/* Variant Selector */}
-            {product.variantes && product.variantes.opciones.length > 0 && (
-              <div className="mb-4">
-                <label className="text-sm font-medium mb-1 block">
-                  {product.variantes.tipo[0].toUpperCase() + product.variantes.tipo.slice(1)}:
-                </label>
-                <select
-                  value={selectedVariant}
-                  onChange={(e) => setSelectedVariant(e.target.value)}
-                  className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary outline-none"
-                >
-                  <option value="">Selecciona {product.variantes.tipo}</option>
-                  {product.variantes.opciones.map((opt) => (
-                    <option key={opt} value={opt}>
-                      {opt}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            )}
+            {console.log(product.variantes)}
+            {product?.variantes?.tipo && product.variantes.tipo.trim() !== "" &&
+              product?.variantes?.opciones?.length > 0 && (
+                <div className="mb-4">
+                  <label className="text-sm font-medium mb-1 block">
+                    {product.variantes.tipo[0].toUpperCase() + product.variantes.tipo.slice(1)}:
+                  </label>
+                  <select
+                    value={selectedVariant}
+                    onChange={(e) => setSelectedVariant(e.target.value)}
+                    className="w-full px-3 py-2 border border-border rounded-lg bg-background text-sm focus:ring-2 focus:ring-primary outline-none"
+                  >
+                    <option value="">Selecciona {product.variantes.tipo}</option>
+                    {product.variantes.opciones.map((opt) => (
+                      <option key={opt} value={opt}>
+                        {opt}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
 
             {/* Quantity Selector */}
             <div className="flex items-center gap-4 mb-6">
@@ -258,7 +266,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
             <div className="flex gap-3">
               <button
                 onClick={handleAddToCart}
-                disabled={product.stock === 0 || (product.variantes && selectedVariant === "")}
+                //disabled={product.stock === 0 || (product.variantes && selectedVariant === "")}
+                disabled={hasSelectableVariants && selectedVariant === ""}
                 className={cn(
                   "flex-1 py-3 rounded-xl font-semibold text-lg",
                   "flex items-center justify-center gap-2",
