@@ -155,7 +155,7 @@ export default function AdminProductsPage() {
         precioCompra: formData.precioCompra ?? 0,
         precioOriginal: formData.precioOriginal ?? 0,
         precioFinal: formData.precioFinal ?? 0,
-        stock: formData.stock ?? 0,
+        stock: formData.stock ?? 10,
         etiqueta: formData.etiqueta || null,
       }
       if (editingProduct) {
@@ -840,7 +840,7 @@ export default function AdminProductsPage() {
                         type="number"
                         name="stock"
                         min="0"
-                        value={formData.stock === 0 || formData.stock === null ? "10" : formData.stock}
+                        value={formData.stock === 0 || formData.stock === null ? "" : formData.stock}
                         onChange={handleChange}
                         className="w-full px-4 py-3 bg-background border border-border rounded-lg focus:ring-2 focus:ring-primary outline-none text-sm"
                         required
