@@ -607,6 +607,7 @@ export default function AdminProductsPage() {
                       <option value="talla">Tallas</option>
                       <option value="fragancia">Fragancias</option>
                       <option value="color">Colores</option>
+                       <option value="tonalidad">Tonalidad</option>
                     </select>
                   </div>
 
