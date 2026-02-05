@@ -151,7 +151,18 @@ export default function AdminProductsPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setSaving(true)
+
     try {
+      const variantesLimpias =
+        formData.variantes.tipo
+          ? {
+            tipo: formData.variantes.tipo,
+            opciones: formData.variantes.opciones.filter(
+              (op) => op.trim() !== ""
+            ),
+          }
+          : null
+
       const productData = {
         ...formData,
         precioCompra: formData.precioCompra ?? 0,
@@ -159,12 +170,20 @@ export default function AdminProductsPage() {
         precioFinal: formData.precioFinal ?? 0,
         stock: formData.stock ?? 0,
         etiqueta: formData.etiqueta || null,
+
+        // 👇 AQUÍ ESTÁ LA CLAVE
+        variantes:
+          variantesLimpias && variantesLimpias.opciones.length > 0
+            ? variantesLimpias
+            : null,
       }
+
       if (editingProduct) {
         await updateProduct(editingProduct.id, productData)
       } else {
         await addProduct(productData)
       }
+
       closeModal()
     } catch (error) {
       console.error("Error saving product:", error)
@@ -173,6 +192,7 @@ export default function AdminProductsPage() {
       setSaving(false)
     }
   }
+
 
   const capitalizeWords = (text: string) => {
     return text
