@@ -28,11 +28,19 @@ export async function PUT(
     const { id } = await params
     const body = await request.json()
 
-    // Asegurar precioCompra y que precioFinal tenga valor
+    // Limpiar variantes vacías
+    const cleanVariants = body.variantes && body.variantes.tipo
+      ? {
+        tipo: body.variantes.tipo,
+        opciones: body.variantes.opciones.filter((op: string) => op.trim() !== "")
+      }
+      : null
+
     const updatedData = {
       ...body,
       precioCompra: body.precioCompra ?? 0,
-      precioFinal: (body.precioFinal === 0 || body.precioFinal == null) ? body.precioOriginal : body.precioFinal
+      precioFinal: (body.precioFinal === 0 || body.precioFinal == null) ? body.precioOriginal : body.precioFinal,
+      variantes: cleanVariants
     }
 
     const updatedProduct = await updateProduct(Number(id), updatedData)
@@ -47,6 +55,7 @@ export async function PUT(
     return NextResponse.json({ error: "Error updating product" }, { status: 500 })
   }
 }
+
 
 export async function DELETE(
   request: Request,

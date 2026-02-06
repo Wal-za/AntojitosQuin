@@ -148,50 +148,46 @@ export default function AdminProductsPage() {
     setFormData(emptyForm)
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
+  setSaving(true)
 
-    try {
-      const variantesLimpias =
-        formData.variantes.tipo
-          ? {
-            tipo: formData.variantes.tipo,
-            opciones: formData.variantes.opciones.filter(
-              (op) => op.trim() !== ""
-            ),
-          }
-          : null
-
-      const productData = {
-        ...formData,
-        precioCompra: formData.precioCompra ?? 0,
-        precioOriginal: formData.precioOriginal ?? 0,
-        precioFinal: formData.precioFinal ?? 0,
-        stock: formData.stock ?? 0,
-        etiqueta: formData.etiqueta || null,
-
-        // 👇 AQUÍ ESTÁ LA CLAVE
-        variantes:
-          variantesLimpias && variantesLimpias.opciones.length > 0
-            ? variantesLimpias
-            : null,
-      }
-
-      if (editingProduct) {
-        await updateProduct(editingProduct.id, productData)
-      } else {
-        await addProduct(productData)
-      }
-
-      closeModal()
-    } catch (error) {
-      console.error("Error saving product:", error)
-      alert("Error al guardar el producto")
-    } finally {
-      setSaving(false)
+  try {
+    // Limpieza de variantes (SIN convertir a null)
+    const variantesLimpias = {
+      tipo: formData.variantes.tipo,
+      opciones: formData.variantes.opciones.filter(
+        (op) => op.trim() !== ""
+      ),
     }
+
+    const productData = {
+      ...formData,
+      precioCompra: formData.precioCompra ?? 0,
+      precioOriginal: formData.precioOriginal ?? 0,
+      precioFinal: formData.precioFinal ?? 0,
+      stock: formData.stock ?? 0,
+      etiqueta: formData.etiqueta || null,
+
+      // 👇 SIEMPRE enviar variantes
+      variantes: variantesLimpias,
+    }
+
+    if (editingProduct) {
+      await updateProduct(editingProduct.id, productData)
+    } else {
+      await addProduct(productData)
+    }
+
+    closeModal()
+  } catch (error) {
+    console.error("Error saving product:", error)
+    alert("Error al guardar el producto")
+  } finally {
+    setSaving(false)
   }
+}
+
 
 
   const capitalizeWords = (text: string) => {
