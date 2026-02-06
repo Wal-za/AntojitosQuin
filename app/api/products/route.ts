@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server"
-import { getAllProducts, createProduct, searchProducts } from "@/lib/products-db"
+import { createProduct, getAllProducts, searchProducts } from "@/lib/products-db"
 
 export async function GET(request: Request) {
   try {
@@ -30,11 +30,20 @@ export async function POST(request: Request) {
   try {
     const body = await request.json()
 
-    // Si precioFinal no viene, usar precioOriginal
-    const precioFinal = (!body.precioFinal || body.precioFinal === body.precioOriginal)
-  ? body.precioOriginal
-  : body.precioFinal;
+    // Limpiar variantes vacías
+    const cleanVariants = body.variantes && body.variantes.tipo
+      ? {
+          tipo: body.variantes.tipo,
+          opciones: Array.isArray(body.variantes.opciones)
+            ? body.variantes.opciones.filter((op: string) => op.trim() !== "")
+            : []
+        }
+      : null
 
+    // Ajustar precioFinal si no viene
+    const precioFinal = (!body.precioFinal || body.precioFinal === 0)
+      ? body.precioOriginal
+      : body.precioFinal
 
     const product = await createProduct({
       nombre: body.nombre,
@@ -45,7 +54,8 @@ export async function POST(request: Request) {
       descripcion: body.descripcion,
       imagenes: Array.isArray(body.imagenes) && body.imagenes.length > 0 ? body.imagenes : [],
       etiqueta: body.etiqueta || null,
-      stock: body.stock || 0,
+      stock: body.stock ?? 0,
+      variantes: cleanVariants, // <--- Aquí se guardan las variantes
     })
 
     return NextResponse.json(product, { status: 201 })

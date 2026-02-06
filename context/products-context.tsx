@@ -148,6 +148,7 @@ export function ProductsProvider({ children }: { children: ReactNode }) {
 
   const addProduct = async (product: Omit<Product, "id">) => {
     try {
+
       const response = await fetch("/api/products", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
