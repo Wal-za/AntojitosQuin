@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useProducts } from "@/context/products-context"
 import { OfferCard } from "./OfferCard"
 import { Sparkles } from "lucide-react"
@@ -11,6 +11,7 @@ export function OffersSection() {
   const categoriaSeleccionada = ""
   const Textofertaslanding = "Ofertas en la canasta familiar hasta "
   const Descuento = "80%"
+
 
   // Filtrar productos por categoría; si no hay ninguno, mostrar todos
   const filteredProducts = products.filter(
@@ -25,7 +26,7 @@ export function OffersSection() {
   )
 
   // Ordenación
-  const [sortOption, setSortOption] = useState("default") 
+  const [sortOption, setSortOption] = useState("default")
 
   const sortedProducts = [...productsToShow].sort((a, b) => {
     switch (sortOption) {
@@ -51,6 +52,13 @@ export function OffersSection() {
     startIndex,
     startIndex + ITEMS_PER_PAGE
   )
+
+  useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      behavior: "smooth",
+    });
+  }, [currentPage]);
 
   if (products.length === 0) return null
 
@@ -122,6 +130,7 @@ export function OffersSection() {
           <button
             className="px-3 py-1 border rounded disabled:opacity-50"
             onClick={() =>
+
               setCurrentPage((prev) => Math.min(prev + 1, totalPages))
             }
             disabled={currentPage === totalPages}

@@ -56,10 +56,22 @@ export default function AdminOrdersPage() {
   }
 
   const handlePrevious = () => {
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
     if (currentPage > 1) setCurrentPage((prev) => prev - 1)
   }
 
   const handleNext = () => {
+
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+
     if (currentPage < totalPages) setCurrentPage((prev) => prev + 1)
   }
 
