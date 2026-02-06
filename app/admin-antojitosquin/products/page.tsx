@@ -149,48 +149,47 @@ export default function AdminProductsPage() {
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSaving(true)
+  e.preventDefault()
+  setSaving(true)
 
-    try {
-      // Limpieza de variantes (SIN convertir a null)
-      const variantesLimpias = {
-        tipo: formData.variantes.tipo,
-        opciones: formData.variantes.opciones.filter(
-          (op) => op.trim() !== ""
-        ),
-      }
+  try {
+    // Limpiar variantes vacías
+    const variantesLimpias =
+      formData.variantes?.tipo
+        ? {
+            tipo: formData.variantes.tipo,
+            opciones: formData.variantes.opciones.filter(op => op.trim() !== "")
+          }
+        : null
 
-      const productData = {
-        ...formData,
-        precioCompra: formData.precioCompra ?? 0,
-        precioOriginal: formData.precioOriginal ?? 0,
-        precioFinal: formData.precioFinal ?? 0,
-        stock: formData.stock ?? 0,
-        etiqueta: formData.etiqueta || null,
-        variantes:
-          formData.variantes.tipo
-            ? {
-              tipo: formData.variantes.tipo,
-              opciones: formData.variantes.opciones.filter(op => op.trim() !== "")
-            }
-            : null
-      }
-
-      if (editingProduct) {
-        await updateProduct(editingProduct.id, productData)
-      } else {
-        await addProduct(productData)
-      }
-
-      closeModal()
-    } catch (error) {
-      console.error("Error saving product:", error)
-      alert("Error al guardar el producto")
-    } finally {
-      setSaving(false)
+    // Construir el objeto final para enviar
+    const productData = {
+      ...formData,
+      precioCompra: formData.precioCompra ?? 0,
+      precioOriginal: formData.precioOriginal ?? 0,
+      precioFinal: formData.precioFinal ?? formData.precioOriginal ?? 0,
+      stock: formData.stock ?? 0,
+      etiqueta: formData.etiqueta || null,
+      ...(variantesLimpias && { variantes: variantesLimpias }) // ✅ Solo se envía si existen variantes
     }
+
+    if (editingProduct) {
+      // Actualizar producto existente
+      await updateProduct(editingProduct.id, productData)
+    } else {
+      // Crear nuevo producto
+      await addProduct(productData)
+    }
+
+    closeModal()
+  } catch (error) {
+    console.error("Error saving product:", error)
+    alert("Error al guardar el producto")
+  } finally {
+    setSaving(false)
   }
+}
+
 
 
 
