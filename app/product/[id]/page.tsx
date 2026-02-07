@@ -12,6 +12,8 @@ import { ScrollToTop } from "@/components/scroll-to-top"
 import { useProducts } from "@/context/products-context"
 import { useCart } from "@/context/cart-context"
 import { cn } from "@/lib/utils"
+import { marked } from "marked"
+
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
@@ -189,11 +191,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             {/* DESCRIPCION */}
 
-            <p
-              className="text-muted-foreground leading-relaxed mb-6 whitespace-pre-wrap"
-            >
-              {product.descripcion}
-            </p>
+<p
+  className="text-muted-foreground leading-relaxed mb-6"
+  dangerouslySetInnerHTML={{
+    __html: product.descripcion
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // negrita
+      .replace(/\n/g, '<br>') // saltos de línea
+  }}
+></p>
 
             {/* Stock 
             <div className="mb-6">

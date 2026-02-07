@@ -51,6 +51,7 @@
     "kerberos": "latest",
     "lodash.debounce": "^4.0.8",
     "lucide-react": "^0.454.0",
+    "marked": "^17.0.1",
     "mongodb": "latest",
     "mongodb-client-encryption": "latest",
     "next": "^16.0.7",
