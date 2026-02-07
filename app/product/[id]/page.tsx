@@ -13,6 +13,8 @@ import { useProducts } from "@/context/products-context"
 import { useCart } from "@/context/cart-context"
 import { cn } from "@/lib/utils"
 import { marked } from "marked"
+import "@/styles/globals2.css";
+
 
 
 export default function ProductDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -123,49 +125,63 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
         <div className="grid md:grid-cols-2 gap-8 animate-slide-up">
 
           {/* Image Gallery */}
-          <div className="flex flex-col gap-4">
-            {/* Imagen principal */}
-            <div className="relative aspect-square rounded-2xl overflow-hidden bg-card shadow-md">
-              <Image
-                src={selectedImage || images[0] || "/placeholder.svg"}
-                alt={product.nombre}
-                fill
-                className="object-cover"
-                priority
-              />
-              {discount > 0 && (
-                <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground px-3 py-1.5 rounded-lg text-sm font-bold">
-                  -{discount}% OFF
-                </div>
-              )}
-              {product.etiqueta && (
-                <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm font-semibold">
-                  {product.etiqueta}
-                </div>
-              )}
-            </div>
+          <div className="miniatura relative w-full max-w-full overflow-x-hidden">
+            <div className="flex flex-col gap-4 w-full max-w-full">
 
-            {/* Miniaturas */}
-            <div className="flex gap-2 overflow-x-auto">
-              {images.map((img, index) => (
-                <button
-                  key={index}
-                  onClick={() => setSelectedImage(img)}
-                  className={cn(
-                    "relative w-13 h-13 rounded-lg overflow-hidden border-2 flex-shrink-0",
-                    selectedImage === img ? "border-primary" : "border-border"
-                  )}
-                >
-                  <Image
-                    src={img}
-                    alt={`${product.nombre} ${index + 1}`}
-                    fill
-                    className="object-cover"
-                  />
-                </button>
-              ))}
+              {/* Imagen principal */}
+              <div className="relative w-full aspect-square min-h-0 rounded-2xl overflow-hidden bg-card shadow-md">
+                <Image
+                  src={selectedImage ?? images?.[0] ?? "/placeholder.svg"}
+                  alt={product.nombre}
+                  fill
+                  sizes="100vw"
+                  className="object-cover"
+                  priority
+                />
+
+                {discount > 0 && (
+                  <div className="absolute top-4 left-4 bg-destructive text-destructive-foreground px-3 py-1.5 rounded-lg text-sm font-bold">
+                    -{discount}% OFF
+                  </div>
+                )}
+
+                {product.etiqueta && (
+                  <div className="absolute top-4 right-4 bg-primary text-primary-foreground px-3 py-1.5 rounded-lg text-sm font-semibold">
+                    {product.etiqueta}
+                  </div>
+                )}
+              </div>
+
+              {/* Carrusel de miniaturas (móvil) */}
+              <div className="relative w-full max-w-full overflow-x-auto px-2 scrollbar-thin scrollbar-thumb-primary scrollbar-track-gray-200">
+                <div className="flex gap-2 snap-x snap-mandatory">
+                  {images.map((img, index) => (
+                    <button
+                      key={index}
+                      type="button"
+                      onClick={() => setSelectedImage(img)}
+                      className={cn(
+                        "relative w-14 h-14 min-w-[3.5rem] rounded-lg overflow-hidden border-2 snap-center focus:outline-none focus:ring-2 focus:ring-primary/40",
+                        selectedImage === img ? "border-primary" : "border-border"
+                      )}
+                    >
+                      <Image
+                        src={img}
+                        alt={`${product.nombre} ${index + 1}`}
+                        fill
+                        sizes="56px"
+                        className="object-cover"
+                      />
+                    </button>
+                  ))}
+                </div>
+              </div>
+
             </div>
           </div>
+
+
+
 
           {/* Info */}
           <div className="flex flex-col">
@@ -191,14 +207,14 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             {/* DESCRIPCION */}
 
-<p
-  className="text-muted-foreground leading-relaxed mb-6"
-  dangerouslySetInnerHTML={{
-    __html: product.descripcion
-      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // negrita
-      .replace(/\n/g, '<br>') // saltos de línea
-  }}
-></p>
+            <p
+              className="text-muted-foreground leading-relaxed mb-6"
+              dangerouslySetInnerHTML={{
+                __html: product.descripcion
+                  .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // negrita
+                  .replace(/\n/g, '<br>') // saltos de línea
+              }}
+            ></p>
 
             {/* Stock 
             <div className="mb-6">
