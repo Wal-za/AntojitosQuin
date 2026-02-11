@@ -19,6 +19,8 @@ export async function GET(request: Request) {
       products = products.filter((p) => p.categoria === category)
     }
 
+    products = products.sort((a, b) => a.id - b.id)  // Orden ascendente por ID
+
     return NextResponse.json(products)
   } catch (error) {
     console.error("Error fetching products:", error)
