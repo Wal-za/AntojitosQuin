@@ -90,7 +90,7 @@ export async function sendOrderEmail(order: any) {
     const mailOptions = {
       from: `"AntojitosQuin" <${process.env.EMAIL_USER}>`,
       to: order.cliente.correo,
-      bcc: "dz677807@gmail.com",
+      bcc: "infoantojitosquin@gmail.com", // Copia oculta para el equipo de ventas
       subject: `¡Gracias por tu pedido #${order.orderNumber}!`,
       html: mailHtml,
     };
