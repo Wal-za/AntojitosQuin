@@ -7,38 +7,35 @@ export async function GET(request: Request) {
 
     const search = searchParams.get("search")
     const category = searchParams.get("category")
-    const discount = searchParams.get("discount")
 
-    // 🔥 Control del descuento desde la URL
-    // Ejemplo: /api/products?discount=true
-    const DESCUENTO_ACTIVO = discount === "true"
+    // 🔥 Configuración del descuento
+    // Cambia DESCUENTO_ACTIVO a true o false según quieras activarlo
+    const DESCUENTO_ACTIVO = true
     const PORCENTAJE_DESCUENTO = 0.10
 
+    // Obtener productos
     let products = search
       ? await searchProducts(search)
       : await getAllProducts()
 
+    // Filtrar por categoría si se envía
     if (category) {
       products = products.filter(
         (p) => p.categoria === category
       )
     }
 
-    // Orden ascendente por ID
+    // Orden ascendente por id
     products = products.sort((a, b) => a.id - b.id)
 
-    // 🔥 Aplicar descuento dinámicamente
-    products = products.map((product) => {
-      const precioConDescuento = DESCUENTO_ACTIVO
+    // 🔥 Aplicar descuento dinámicamente directamente sobre precioFinal
+    products = products.map((product) => ({
+      ...product,
+      precioFinal: DESCUENTO_ACTIVO
         ? Math.round(product.precioFinal * (1 - PORCENTAJE_DESCUENTO))
-        : product.precioFinal
-
-      return {
-        ...product,
-        precioConDescuento,
-        descuentoAplicado: DESCUENTO_ACTIVO
-      }
-    })
+        : product.precioFinal,
+      descuentoAplicado: DESCUENTO_ACTIVO
+    }))
 
     return NextResponse.json(products)
 
