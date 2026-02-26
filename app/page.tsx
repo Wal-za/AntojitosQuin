@@ -9,6 +9,7 @@ import { OffersSection } from "@/components/offers-section"
 import { ScrollToTop } from "@/components/scroll-to-top"
 import { useProducts } from "@/context/products-context"
 import { SearchX, Loader2 } from "lucide-react"
+import { PromoModal } from "@/components/promo-modal"
 
 export default function HomePage() {
   const { products, searchProducts, getProductsByCategory, loading, error } = useProducts()
@@ -116,6 +117,7 @@ export default function HomePage() {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <StoreHeader />
+      <PromoModal />
 
       {/* Hero Banner */}
       <section className="bg-gradient-to-r from-primary/10 via-accent/10 to-secondary/10 py-8 px-4">

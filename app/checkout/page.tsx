@@ -357,6 +357,101 @@ export default function CheckoutPage() {
           {shippingMessage && <p className="text-sm text-muted-foreground">{shippingMessage}</p>}
         </div>
       </main>
+
+      {showPolicyModal && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 px-4">
+          <div className="bg-white p-6 rounded-xl max-w-lg w-full max-h-[80vh] overflow-y-auto">
+            <h2 className="text-lg font-bold mb-4">Política de Tratamiento de Datos Personales</h2>
+
+            <div className="text-sm text-gray-600 space-y-4">
+
+              <p>
+                Esta tienda virtual recopila únicamente los datos personales necesarios
+                para gestionar la compra y entrega de productos.
+              </p>
+
+              <div>
+                <p className="font-semibold">1. Datos que recopilamos</p>
+                <p>
+                  Nombre completo, dirección de entrega, departamento, ciudad,
+                  número de teléfono y correo electrónico.
+                </p>
+              </div>
+
+              <div>
+                <p className="font-semibold">2. Finalidad del tratamiento</p>
+                <ul className="list-disc pl-5 space-y-1">
+                  <li>Procesar y confirmar pedidos.</li>
+                  <li>Coordinar y realizar la entrega del producto.</li>
+                  <li>Contactar al cliente en caso de novedades con el pedido.</li>
+                  <li>Llevar control interno de ventas, facturación e inventario.</li>
+                </ul>
+              </div>
+
+              <div>
+                <p className="font-semibold">3. Uso para comunicaciones</p>
+                <p>
+                  El correo electrónico podrá utilizarse para enviar información
+                  relacionada con el estado del pedido y, ocasionalmente,
+                  promociones o novedades de la marca.
+                  El usuario podrá solicitar en cualquier momento dejar de recibir
+                  comunicaciones promocionales.
+                </p>
+              </div>
+
+              <div>
+                <p className="font-semibold">4. No compartimos datos con terceros</p>
+                <p>
+                  Los datos personales no serán vendidos, cedidos ni compartidos
+                  con terceros, salvo cuando sea estrictamente necesario para
+                  cumplir con la entrega del pedido (por ejemplo, empresa transportadora).
+                </p>
+              </div>
+
+              <div>
+                <p className="font-semibold">5. Almacenamiento y seguridad</p>
+                <p>
+                  La información es almacenada de manera interna con medidas
+                  razonables de seguridad para evitar accesos no autorizados,
+                  pérdida o alteración de los datos.
+                </p>
+              </div>
+
+              <div>
+                <p className="font-semibold">6. Tiempo de conservación</p>
+                <p>
+                  Los datos serán conservados únicamente durante el tiempo
+                  necesario para cumplir con las finalidades mencionadas
+                  y para efectos contables o legales aplicables.
+                </p>
+              </div>
+
+              <div>
+                <p className="font-semibold">7. Derechos del usuario</p>
+                <p>
+                  El usuario podrá solicitar en cualquier momento la actualización,
+                  corrección o eliminación de sus datos personales enviando una
+                  solicitud a los canales oficiales de contacto de la tienda.
+                </p>
+              </div>
+
+              <p>
+                Al aceptar esta política, el usuario autoriza de manera libre,
+                previa, expresa e informada el tratamiento de sus datos personales
+                conforme a las condiciones aquí establecidas.
+              </p>
+
+            </div>
+
+            <button
+              onClick={() => setShowPolicyModal(false)}
+              className="mt-6 w-full bg-primary text-white py-2 rounded-lg font-semibold"
+            >
+              Aceptar y cerrar
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
